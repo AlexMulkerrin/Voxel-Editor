@@ -9,7 +9,10 @@ function IsometricRender(schematic) {
   this.blockImage = new Image();
   this.blockImage.crossOrigin = "Anonymous";
   this.blockImage.src = "Resources/Images/IsometricBlock.png";
-  this.blockImage.onload = this.createRender();
+  var t = this;
+  this.blockImage.onload = function() {
+	  t.createRender();
+  }
 }
 IsometricRender.prototype.createRender = function () {
   this.createTileSheet();
