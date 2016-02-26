@@ -192,7 +192,7 @@ Display.prototype.drawInfo = function () {
     // top bar info
     this.ctx.fillStyle = "#000033";
     this.ctx.fillText("Edit", 5, 13);
-    this.ctx.fillText("*Schematic.png - Voxel Editor v0.4", 45, 13);
+    this.ctx.fillText("*Schematic.png - Voxel Editor v0.2", 45, 13);
 
     this.ctx.fillText("Current block: "+this.targetSchematic.palette[this.targetControl.currentPalette].material, 123, 38);
 	this.ctx.fillText("R: ", 232, 38);
