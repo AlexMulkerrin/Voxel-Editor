@@ -15,7 +15,7 @@ function Display(canvasName, schematic, control) {
 }
 
 Display.prototype.loadIcons = function () {
-    var iconName = [   "new", "load", "save", "wire", "charge", "inverter", "splitter",
+    var iconName = [   "new", "load", "save", "increase", "decrease", "camera", "splitter",
 						"rotate", "remove", "undo", "redo", "run", "pause", "fullscreen",
 						"windowed", "scrollUp", "scrollDown", "scrollLeft", "scrollRight",
 						"resize", "position", "fitToWindow", "zoomIn", "zoomOut",
@@ -82,6 +82,11 @@ Display.prototype.drawSlice = function() {
 Display.prototype.drawIsometricRender = function() {
   var tx = this.canvas.width - this.render.outputImage.width;
   this.ctx.drawImage(this.render.outputImage, tx-17, 48);
+
+  this.ctx.fillStyle = "#9FAEC2";
+  this.ctx.fillRect(tx-17, 48, 1, this.render.outputImage.height);
+  this.ctx.fillRect(tx-17, 48+this.render.outputImage.height, this.render.outputImage.width, 1);
+
 }
 
 Display.prototype.drawInterface = function () {
@@ -108,7 +113,8 @@ Display.prototype.drawInterface = function () {
     //this.ctx.fillRect(289, 29, 1, 13);
     // bottom bar dividers
     this.ctx.fillStyle = "#9FAEC2";
-    //this.ctx.fillRect(85, c.height - 19, 1, 13);
+    this.ctx.fillRect(132, c.height - 19, 1, 13);
+	this.ctx.fillRect(335, c.height - 19, 1, 13);
     this.ctx.fillRect(c.width - 122, c.height - 19, 1, 13);
 }
 Display.prototype.drawButtons = function () {
@@ -185,7 +191,7 @@ Display.prototype.drawInfo = function () {
     var c = this.canvas;
     // top bar info
     this.ctx.fillStyle = "#000033";
-    this.ctx.fillText("File", 5, 13);
+    this.ctx.fillText("Edit", 5, 13);
     this.ctx.fillText("*Schematic.png - Voxel Editor v0.4", 45, 13);
 
     this.ctx.fillText("Current block: "+this.targetSchematic.palette[this.targetControl.currentPalette].material, 123, 38);
@@ -193,24 +199,18 @@ Display.prototype.drawInfo = function () {
 	this.ctx.fillText("G: ", 352, 38);
 	this.ctx.fillText("B: ", 472, 38);
 	this.ctx.fillText("Palette: ", 612, 38);
-    //if (this.targetSim.isRunning) {
-    //    this.ctx.fillText("running", 360, 38);
-  //  } else {
-    //    this.ctx.fillText("paused", 360, 38);
-  //  }
-    //this.ctx.fillText("generation: ", 460, 38);
 
     // bottom bar info
     this.ctx.fillText("size: " + this.targetSchematic.width + " x " + this.targetSchematic.height + " x " + this.targetSchematic.depth, 5, c.height - 10);
 	var mouse = this.targetControl.mouse;
-	this.ctx.fillText("mouse: " + mouse.latticeX + "," + mouse.latticeY + "," + mouse.latticeZ, 149, c.height - 10);
+	this.ctx.fillText("mouse: " + mouse.latticeX + "," + mouse.latticeY + "," + mouse.latticeZ, 179, c.height - 10);
 	if (mouse.isPressed) {
 		var dx = Math.abs(mouse.oldLatticeX - mouse.latticeX);
 		var dy = Math.abs(mouse.oldLatticeY - mouse.latticeY);
 		var dz = Math.abs(mouse.oldLatticeZ - mouse.latticeZ);
-		this.ctx.fillText("(" + (dx+1) + "," + (dy+1) + "," + (dz+1) + ")", 239, c.height - 10);
+		this.ctx.fillText("(" + (dx+1) + "," + (dy+1) + "," + (dz+1) + ")", 269, c.height - 10);
 	}
-    this.ctx.fillText("viewing slice: " + this.targetControl.view.sliceHeight, 299, c.height - 10);
+    this.ctx.fillText("viewing slice: " + this.targetControl.view.sliceHeight, 359, c.height - 10);
     this.ctx.fillText(this.targetControl.view.pixelPerCell + ":" + this.targetControl.view.cellPerPixel, c.width - 102, c.height - 10);
 }
 
@@ -218,11 +218,11 @@ Display.prototype.drawTooltips = function () {
 	for (var i = 0; i < this.targetControl.button.length; i++) {
 		var button = this.targetControl.button[i];
 		if (button.isHovered || button.isClicked) {
-			var text = button.function;
+			var text = button.function+" ("+button.hotkey+")";
 			var x = button.x+button.width;
 			if (button.x>this.canvas.width/2) x = button.x-this.ctx.measureText(text).width;
 			var y = button.y+button.height+12;
-			if (button.y>this.canvas.height/2) y = button.y;
+			if (button.y>this.canvas.height/2) y = button.y-10;
 			this.ctx.fillStyle = "#9FAEC2";
 			this.ctx.fillRect(x-4, y-10, this.ctx.measureText(text).width+8, 16);
 			this.ctx.fillStyle = "#ffffff";

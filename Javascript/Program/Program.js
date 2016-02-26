@@ -41,6 +41,7 @@ Program.prototype.loadJSON = function(fileInput) {
 		var loadedText = fileLoadedEvent.target.result;
 		var resultJSON = JSON.parse(loadedText);
 		t.schematic.readJSON(resultJSON);
+		t.control.view.sliceHeight = 0;
 		t.display.updatePalette();
 	};
 	fileReader.readAsText(file, "UTF-8");
@@ -56,6 +57,7 @@ Program.prototype.loadEncodedImage = function(fileInput) {
 			var decodedText = t.decodeTextFromImage(image);
 			var resultJSON = JSON.parse(decodedText);
 			t.schematic.readJSON(resultJSON);
+			t.control.view.sliceHeight = 0;
 			t.display.updatePalette();
 		}
 	};

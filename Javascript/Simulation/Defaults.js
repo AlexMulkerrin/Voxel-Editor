@@ -11,6 +11,8 @@ function defaultPalette() {
   	{name:"block #3", symbol:"E", material:"solid", colour:"#00ff00"},
   	{name:"block #4", symbol:"F", material:"solid", colour:"#0000ff"},
   	{name:"block #5", symbol:"G", material:"solid", colour:"#000000"},
-  	{name:"block #6", symbol:"H", material:"solid", colour:"#ffffff"}
+  	{name:"block #6", symbol:"H", material:"solid", colour:"#ffffff"}//,
+	//{name:"block #7", symbol:"I", material:"solid", colour:"#ff00ff"},
+	//{name:"block #8", symbol:"J", material:"solid", colour:"#00ffff"}
   ]
 }

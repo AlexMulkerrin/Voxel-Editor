@@ -14,14 +14,91 @@ function Control(canvasName, schematic, program) {
 	this.currentColour = colourComponents(this.targetSchematic.palette[0].colour);
 
 	this.createButtons();
-	//this.createKeyboardEventHandlers();
+	this.createKeyboardEventHandlers();
 	this.createCanvasEventHandlers();
 }
 Control.prototype.linkDisplay = function(display) {
     this.targetDisplay=display;
 	this.fitToWindow();
 }
+Control.prototype.createKeyboardEventHandlers = function () {
+    var t = this;
+    document.onkeydown = function (event) {
+        var keyCode;
+        if (event === null) {
+            keyCode = window.event.keyCode;
+        } else {
+            keyCode = event.keyCode;
+        }
 
+		if (keyCode>47 && keyCode<58) { //numeric key
+			var num = keyCode-49;
+			if (num<0) num=9;
+			if (num < t.targetSchematic.palette.length) {
+				t.selectPalette(num);
+			}
+		}
+
+        switch (keyCode) {
+			case 85: // u
+                t.newFile();
+                break;
+			case 73: // i
+				t.loadFile();
+				break;
+			case 79: // o
+				t.saveAsJSON();
+				break;
+			case 80: // p
+				t.saveAsImage();
+				break;
+
+			case 70: // f
+				t.fullscreen();
+				break;
+
+            case 65:
+            case 37: // a or left arrow
+                t.scrollLeft();
+                break;
+            case 38:
+            case 87: // w or up arrow
+                t.scrollUp();
+                break;
+            case 39:
+            case 68: // d or right arrow
+                t.scrollRight();
+                break;
+            case 40:
+            case 83: // s or down arrow
+                t.scrollDown();
+                break;
+
+			case 78: // n
+				t.increaseSize();
+				break;
+			case 77: // m
+				t.decreaseSize();
+				break;
+			case 69: // e
+				t.shiftViewUp();
+				break;
+			case 81: // q
+				t.shiftViewDown();
+				break;
+
+			case 74: // j
+				t.fitToWindow();
+				break;
+			case 75: // k
+				t.zoomIn();
+				break;
+			case 76: // l
+				t.zoomOut();
+				break;
+        }
+    };
+}
 Control.prototype.createCanvasEventHandlers = function () {
     var t = this;
 
@@ -61,17 +138,6 @@ Control.prototype.mouseUpdateCoords = function (event) {
     var rect = this.targetCanvas.getBoundingClientRect();
     this.mouse.x = event.clientX - rect.left;
     this.mouse.y = event.clientY - rect.top;
-    this.checkHover();
-}
-Control.prototype.mouseWheel = function (event) {
-    var change = -event.deltaY || event.wheelDelta;
-    if (change < 0) {
-        //this.zoomOut();
-		this.shiftViewDown();
-    } else if (change > 0) {
-        //this.zoomIn();
-		this.shiftViewUp();
-    }
     this.checkHover();
 }
 Control.prototype.checkHover = function () {
@@ -125,13 +191,11 @@ Control.prototype.checkLattice = function () {
         this.mouse.latticeZ = this.targetSchematic.depth - 1;
     }
 }
-
 Control.prototype.setOldHover = function () {
     this.mouse.oldLatticeX = this.mouse.latticeX;
     this.mouse.oldLatticeY = this.mouse.latticeY;
 	this.mouse.oldLatticeZ = this.mouse.latticeZ;
 }
-
 Control.prototype.mousePressed = function (event) {
     this.mouse.buttonPressed = event.which;
     this.mouse.isPressed = true;
@@ -157,60 +221,16 @@ Control.prototype.mouseReleased = function (event) {
     }
     this.targetDisplay.refresh();
 }
-
-
-
-Control.prototype.zoomIn = function () {
-    this.select = "zoom in";
-    this.view.cellPerPixel = this.view.cellPerPixel / 2;
-    if (this.view.cellPerPixel < 1) {
-        this.view.cellPerPixel = 1;
-        this.view.pixelPerCell = this.view.pixelPerCell * 2;
+Control.prototype.mouseWheel = function (event) {
+    var change = -event.deltaY || event.wheelDelta;
+    if (change < 0) {
+        //this.zoomOut();
+		this.shiftViewDown();
+    } else if (change > 0) {
+        //this.zoomIn();
+		this.shiftViewUp();
     }
-
-    this.view.x = Math.floor(this.view.x * 2 - this.mouse.x);
-    this.view.y = Math.floor(this.view.y * 2 - this.mouse.y);
-}
-
-Control.prototype.zoomOut = function () {
-    this.select = "zoom out";
-    this.view.pixelPerCell = this.view.pixelPerCell / 2;
-    if (this.view.pixelPerCell < 1) {
-        this.view.pixelPerCell = 1;
-        this.view.cellPerPixel = this.view.cellPerPixel * 2;
-    }
-
-    this.view.x = (this.view.x + this.targetCanvas.width - this.mouse.x) / 2;
-    this.view.y = (this.view.y + this.targetCanvas.height - this.mouse.y) / 2;
-
-    var maxWorkspaceWidth = this.targetCanvas.width - (this.view.borderLeft + this.view.borderRight);
-    var maxWorkspaceHeight = this.targetCanvas.height - (this.view.borderTop + this.view.borderBottom);
-
-    var workspaceWidth = this.targetSchematic.width * this.view.pixelPerCell / this.view.cellPerPixel;
-    var workspaceHeight = this.targetSchematic.height * this.view.pixelPerCell / this.view.cellPerPixel;
-
-    if (workspaceWidth < maxWorkspaceWidth) {
-        this.view.x = this.view.borderLeft + (maxWorkspaceWidth - workspaceWidth) / 2;
-    }
-    if (workspaceHeight < maxWorkspaceHeight) {
-        this.view.y = this.view.borderTop + (maxWorkspaceHeight - workspaceHeight) / 2;
-    }
-    this.view.x = Math.floor(this.view.x);
-    this.view.y = Math.floor(this.view.y);
-}
-
-Control.prototype.shiftViewUp = function() {
-	this.view.sliceHeight++;
-	if (this.view.sliceHeight >= this.targetSchematic.height) {
-		this.view.sliceHeight = this.targetSchematic.height -1;
-	}
-}
-
-Control.prototype.shiftViewDown = function() {
-	this.view.sliceHeight--;
-	if (this.view.sliceHeight < 0 ) {
-		this.view.sliceHeight = 0;
-	}
+    this.checkHover();
 }
 
 function View() {
@@ -227,7 +247,7 @@ function View() {
     this.pixelPerCell = 16;
     this.cellPerPixel = 1;
 
-	this.sliceHeight = 3;
+	this.sliceHeight = 0;
 }
 
 Control.prototype.createButtons = function () {
@@ -235,56 +255,60 @@ Control.prototype.createButtons = function () {
     var t = this;
 	this.button = [];
     // file modification
-    this.button.push( new Button(2, 24, 22, 22, 0, "newFile") );
-    this.button.push( new Button(26, 24, 22, 22, 1, "loadFile") );
-    this.button.push( new Button(50, 24, 22, 22, 2, "saveAsJSON") );
-	this.button.push( new Button(74, 24, 22, 22, 2, "saveAsImage") );
+    this.button.push( new Button(2, 24, 22, 22, 0, "U", "newFile") );
+    this.button.push( new Button(26, 24, 22, 22, 1, "I", "loadFile") );
+    this.button.push( new Button(50, 24, 22, 22, 2, "O", "saveAsJSON") );
+	this.button.push( new Button(74, 24, 22, 22, 5, "P", "saveAsImage") );
 
     // palette
 	var palette = this.targetSchematic.palette;
 	for (var i=0; i<palette.length; i++) {
-		this.button.push(  new Button(654+i*24, 24, 22, 22, null, "selectPalette", i) );
+		this.button.push(  new Button(654+i*24, 24, 22, 22, null, i+1, "selectPalette", i) );
 	}
 	// colour sliders
-	this.button.push(  new Button(244, 24, 100, 22, null, "changeColour", 0) );
-	this.button.push(  new Button(364, 24, 100, 22, null, "changeColour", 1) );
-	this.button.push(  new Button(484, 24, 100, 22, null, "changeColour", 2) );
+	this.button.push(  new Button(244, 24, 100, 22, null, "", "changeColour", 0) );
+	this.button.push(  new Button(364, 24, 100, 22, null, "", "changeColour", 1) );
+	this.button.push(  new Button(484, 24, 100, 22, null, "", "changeColour", 2) );
 
     // viewport controls
-    this.button.push(  new Button(c.width - 21, 1, 20, 20, 13, "fullscreen") );
+    this.button.push(  new Button(c.width - 21, 1, 20, 20, 13, "F", "fullscreen") );
 
-    this.button.push(  new Button(c.width - 16, 48, 16, 16, 15, "scrollUp") );
-    this.button.push(  new Button(c.width - 16, c.height - 58, 16, 16, 16, "scrollDown") );
-    this.button.push(  new Button(0, c.height - 42, 16, 16, 17, "scrollLeft") );
-    this.button.push(  new Button(c.width - 32, c.height - 42, 16, 16, 18, "scrollRight") );
+    this.button.push(  new Button(c.width - 16, 48, 16, 16, 15, "W", "scrollUp") );
+    this.button.push(  new Button(c.width - 16, c.height - 58, 16, 16, 16, "S", "scrollDown") );
+    this.button.push(  new Button(0, c.height - 42, 16, 16, 17, "A", "scrollLeft") );
+    this.button.push(  new Button(c.width - 32, c.height - 42, 16, 16, 18, "D", "scrollRight") );
 
     // size and scale
     //this.button.push(  new Button(3, c.height - 23, 20, 20, 19, "resize") );
-	this.button.push(  new Button(95, c.height - 23, 20, 9, null, "increaseSize") );
-	this.button.push(  new Button(95, c.height - 12, 20, 9, null, "decreaseSize") );
+	this.button.push(  new Button(95, c.height - 23, 20, 9, 3, "N", "increaseSize") );
+	this.button.push(  new Button(95, c.height - 12, 20, 9, 4, "M", "decreaseSize") );
 
-    this.button.push(  new Button(122, c.height - 23, 20, 20, 20, "noEffect") );
-    this.button.push(  new Button(c.width - 70, c.height - 23, 20, 20, 21, "fitToWindow") );
-    this.button.push(  new Button(c.width - 46, c.height - 23, 20, 20, 22, "zoomIn") );
-    this.button.push(  new Button(c.width - 22, c.height - 23, 20, 20, 23, "zoomOut") );
+	this.button.push(  new Button(440, c.height - 23, 20, 9, 3, "E", "shiftViewUp") );
+	this.button.push(  new Button(440, c.height - 12, 20, 9, 4, "Q", "shiftViewDown") );
+
+    this.button.push(  new Button(152, c.height - 23, 20, 20, 20, "", "noEffect") );
+    this.button.push(  new Button(c.width - 70, c.height - 23, 20, 20, 21, "J", "fitToWindow") );
+    this.button.push(  new Button(c.width - 46, c.height - 23, 20, 20, 22, "K", "zoomIn") );
+    this.button.push(  new Button(c.width - 22, c.height - 23, 20, 20, 23, "L", "zoomOut") );
 
     // scrollbar sections
-    this.button.push( new Button(c.width - 16, 64, 16, 16, null, "scrollUp") );
-    this.button.push(  new Button(c.width - 16, c.height - 74, 16, 16, null, "scrollDown") );
-    this.button.push(  new Button(16, c.height - 42, 16, 16, null, "scrollLeft") );
-    this.button.push(  new Button(c.width - 48, c.height - 42, 16, 16, null, "scrollRight") );
+    this.button.push( new Button(c.width - 16, 64, 16, 16, null, "W", "scrollUp") );
+    this.button.push(  new Button(c.width - 16, c.height - 74, 16, 16, null, "S", "scrollDown") );
+    this.button.push(  new Button(16, c.height - 42, 16, 16, null, "A", "scrollLeft") );
+    this.button.push(  new Button(c.width - 48, c.height - 42, 16, 16, null, "D", "scrollRight") );
 
     // file tab button
   //  this.button[27] = new Button(1, 1, 30, 19, null, "fileMenu");
   this.button[this.currentPalette+4].isSelected = true;
   this.mouse.selected = this.currentPalette+4;
 }
-function Button(x, y, width, height, icon, func, funcArgs) {
+function Button(x, y, width, height, icon, hotkey, func, funcArgs) {
     this.x = x;
     this.y = y;
     this.width = width;
     this.height = height;
     this.icon = icon;
+	this.hotkey = hotkey;
     this.function = func
 	this.functionArguments = funcArgs;
     this.isHovered = false;
@@ -296,6 +320,7 @@ Control.prototype.repositionButtons = function () {
     //this.button[this.mouse.selected].isSelected = true;
 }
 
+// file handling
 Control.prototype.newFile = function () {
 	this.targetSchematic.clear();
 	this.targetDisplay.updateRender();
@@ -313,6 +338,7 @@ Control.prototype.saveAsImage = function() {
     this.targetProgram.saveImage();
 }
 
+// palette editing
 Control.prototype.selectPalette = function(id) {
 	this.currentPalette = id;
 	this.button[this.mouse.selected].isSelected = false;
@@ -320,7 +346,6 @@ Control.prototype.selectPalette = function(id) {
     this.button[this.mouse.selected].isSelected = true;
 	this.currentColour = colourComponents(this.targetSchematic.palette[id].colour);
 }
-
 Control.prototype.changeColour = function(colourID) {
 	var step = 255/100;
 	var newValue = 0;
@@ -338,6 +363,42 @@ Control.prototype.changeColour = function(colourID) {
 	this.targetDisplay.updatePalette();
 }
 
+// move view
+Control.prototype.fullscreen = function() {
+    this.select = "fullscreen";
+
+    if (!document.mozFullScreen && !document.webkitFullScreen) {
+        if (this.targetCanvas.mozRequestFullScreen) {
+            this.targetCanvas.mozRequestFullScreen();
+        } else {
+            this.targetCanvas.webkitRequestFullScreen(Element.ALLOW_KEYBOARD_INPUT);
+        }
+    } else {
+        if (document.mozCancelFullScreen) {
+            document.mozCancelFullScreen();
+        } else {
+            document.webkitCancelFullScreen();
+        }
+    }
+}
+Control.prototype.scrollUp = function() {
+    this.select = "scroll up";
+    this.view.y += this.view.pixelPerCell;
+}
+Control.prototype.scrollDown = function() {
+    this.select = "scroll down";
+    this.view.y -= this.view.pixelPerCell;
+}
+Control.prototype.scrollLeft = function() {
+    this.select = "scroll left";
+    this.view.x += this.view.pixelPerCell;
+}
+Control.prototype.scrollRight = function() {
+    this.select = "scroll right";
+    this.view.x -= this.view.pixelPerCell;
+}
+
+// change schematic size
 Control.prototype.increaseSize = function() {
 	this.targetSchematic.increaseSize();
 	this.fitToWindow();
@@ -351,7 +412,25 @@ Control.prototype.decreaseSize = function() {
 	this.fitToWindow();
 	this.targetDisplay.updateRender();
 }
+Control.prototype.noEffect = function() {
 
+}
+
+// change displayed slice
+Control.prototype.shiftViewUp = function() {
+	this.view.sliceHeight++;
+	if (this.view.sliceHeight >= this.targetSchematic.height) {
+		this.view.sliceHeight = this.targetSchematic.height -1;
+	}
+}
+Control.prototype.shiftViewDown = function() {
+	this.view.sliceHeight--;
+	if (this.view.sliceHeight < 0 ) {
+		this.view.sliceHeight = 0;
+	}
+}
+
+// change zoom level
 Control.prototype.fitToWindow = function() {
 	var model = this.targetSchematic
     this.select = "fit to window";
@@ -371,6 +450,43 @@ Control.prototype.fitToWindow = function() {
 
     var workspaceWidth = model.width * this.view.pixelPerCell / this.view.cellPerPixel;
     var workspaceHeight = model.height * this.view.pixelPerCell / this.view.cellPerPixel;
+
+    if (workspaceWidth < maxWorkspaceWidth) {
+        this.view.x = this.view.borderLeft + (maxWorkspaceWidth - workspaceWidth) / 2;
+    }
+    if (workspaceHeight < maxWorkspaceHeight) {
+        this.view.y = this.view.borderTop + (maxWorkspaceHeight - workspaceHeight) / 2;
+    }
+    this.view.x = Math.floor(this.view.x);
+    this.view.y = Math.floor(this.view.y);
+}
+Control.prototype.zoomIn = function () {
+    this.select = "zoom in";
+    this.view.cellPerPixel = this.view.cellPerPixel / 2;
+    if (this.view.cellPerPixel < 1) {
+        this.view.cellPerPixel = 1;
+        this.view.pixelPerCell = this.view.pixelPerCell * 2;
+    }
+
+    this.view.x = this.view.x-this.targetCanvas.width/4; //Math.floor(this.view.x * 2 - this.mouse.x);
+    this.view.y = this.view.y-this.targetCanvas.height/4;//Math.floor(this.view.y * 2 - this.mouse.y);
+}
+Control.prototype.zoomOut = function () {
+    this.select = "zoom out";
+    this.view.pixelPerCell = this.view.pixelPerCell / 2;
+    if (this.view.pixelPerCell < 1) {
+        this.view.pixelPerCell = 1;
+        this.view.cellPerPixel = this.view.cellPerPixel * 2;
+    }
+
+    this.view.x = (this.view.x + this.targetCanvas.width - this.mouse.x) / 2;
+    this.view.y = (this.view.y + this.targetCanvas.height - this.mouse.y) / 2;
+
+    var maxWorkspaceWidth = this.targetCanvas.width - (this.view.borderLeft + this.view.borderRight);
+    var maxWorkspaceHeight = this.targetCanvas.height - (this.view.borderTop + this.view.borderBottom);
+
+    var workspaceWidth = this.targetSchematic.width * this.view.pixelPerCell / this.view.cellPerPixel;
+    var workspaceHeight = this.targetSchematic.height * this.view.pixelPerCell / this.view.cellPerPixel;
 
     if (workspaceWidth < maxWorkspaceWidth) {
         this.view.x = this.view.borderLeft + (maxWorkspaceWidth - workspaceWidth) / 2;
