@@ -1,3 +1,5 @@
+// Isometric Renderer creates an HTML5 canvas with render output upon it which can be
+// given to Display object to draw.
 function IsometricRender(schematic) {
   this.targetSchematic = schematic;
   this.rotation = 0;
@@ -14,10 +16,16 @@ function IsometricRender(schematic) {
 	  t.createRender();
   }
 }
+
+// create render method called when block image is loaded or when schematic
+// palette is updated and tilesheet needs to be re-populated.
 IsometricRender.prototype.createRender = function () {
   this.createTileSheet();
   this.updateRender();
 }
+
+// creates a tilesheet with default block image adjusted to match each
+// colouration present in schematic palette.
 IsometricRender.prototype.createTileSheet = function (sourceImage) {
   var palette = this.targetSchematic.palette;
   this.tileSheet.width = palette.length*8;
@@ -54,6 +62,8 @@ IsometricRender.prototype.createTileSheet = function (sourceImage) {
     }
   }
 }
+
+// redraws isometric render, to be called when contents of schematic block array changes.
 IsometricRender.prototype.updateRender = function() {
   var rotationTransforms = [ [[1,0],[0,1]], [[0,-1],[1,0]], [[-1,0],[0,-1]], [[0,1],[-1,0]] ];
 
@@ -71,12 +81,12 @@ IsometricRender.prototype.updateRender = function() {
 
         var xxcomp = rotationTransforms[this.rotation][0][0];
         var xzcomp = rotationTransforms[this.rotation][0][1];
-				var zxcomp = rotationTransforms[this.rotation][1][0];
-				var zzcomp = rotationTransforms[this.rotation][1][1];
+	var zxcomp = rotationTransforms[this.rotation][1][0];
+	var zzcomp = rotationTransforms[this.rotation][1][1];
 
-        nx = xxcomp<0 ? model.width - (1+i) : i*xxcomp;
+        nx =  xxcomp<0 ? model.width - (1+i) : i*xxcomp;
         nx += xzcomp<0 ? model.depth - (1+k) : k*xzcomp;
-        nz = zxcomp<0 ? model.width - (1+i) : i*zxcomp;
+        nz =  zxcomp<0 ? model.width - (1+i) : i*zxcomp;
         nz += zzcomp<0 ? model.depth - (i+k) : k*zzcomp;
 
         var id = model.block[nx][j][nz];
