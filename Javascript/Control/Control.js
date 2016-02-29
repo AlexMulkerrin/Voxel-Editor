@@ -443,13 +443,13 @@ Control.prototype.fitToWindow = function() {
     while (this.view.pixelPerCell > maxWorkspaceWidth / model.width && this.view.pixelPerCell > 1) {
         this.view.pixelPerCell = this.view.pixelPerCell / 2;
     }
-    while (this.view.pixelPerCell > maxWorkspaceHeight / model.height && this.view.pixelPerCell > 1) {
+    while (this.view.pixelPerCell > maxWorkspaceHeight / model.depth && this.view.pixelPerCell > 1) {
         this.view.pixelPerCell = this.view.pixelPerCell / 2;
     }
     this.view.cellPerPixel = 1;
 
     var workspaceWidth = model.width * this.view.pixelPerCell / this.view.cellPerPixel;
-    var workspaceHeight = model.height * this.view.pixelPerCell / this.view.cellPerPixel;
+    var workspaceHeight = model.depth * this.view.pixelPerCell / this.view.cellPerPixel;
 
     if (workspaceWidth < maxWorkspaceWidth) {
         this.view.x = this.view.borderLeft + (maxWorkspaceWidth - workspaceWidth) / 2;

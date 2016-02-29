@@ -142,7 +142,7 @@ VoxelSchematic.prototype.readJSON = function(JSONtext) {
 }
 VoxelSchematic.prototype.readRunLengthEncoding = function(JSONtext) {
 	var x=0; y=0; z=0;
-	var result = create3DArray(this.width, this.height, this.depth);
+	var result = create3DArray(this.width, this.height, this.depth,0);
 	var currentCount ="";
 	var runLength = 0;
 	var currentID = 2;

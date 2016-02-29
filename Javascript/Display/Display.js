@@ -66,7 +66,7 @@ Display.prototype.drawSlice = function() {
     } else {
         this.ctx.fillStyle = "#ffffff";
     }
-    this.drawRectOnView(0, 0, model.width * sqSize, model.height *  sqSize);
+    this.drawRectOnView(0, 0, model.width * sqSize, model.depth *  sqSize);
 
 	this.ctx.fillStyle = "#ffffff";
 	var sliceHeight = this.targetControl.view.sliceHeight;
