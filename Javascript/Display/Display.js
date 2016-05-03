@@ -72,9 +72,19 @@ Display.prototype.drawSlice = function() {
 	var sliceHeight = this.targetControl.view.sliceHeight;
     for (var i = 0; i < model.width; i++) {
         for (var k = 0; k < model.depth; k++) {
+
 			var id = model.block[i][sliceHeight][k];
-			this.ctx.fillStyle = model.palette[id].colour;
-            this.drawRectOnView(i * sqSize, k * sqSize, sqSize - 1, sqSize - 1);
+			if (sliceHeight>0 && model.isTransparent(i,sliceHeight,k)) {
+				if (model.isTransparent(i,sliceHeight-1,k)) {
+					this.ctx.fillStyle = model.palette[id].colour;
+				} else {
+					var id = model.block[i][sliceHeight-1][k];
+					this.ctx.fillStyle = colourBlend(model.palette[id].colour, model.palette[0].colour);
+				}
+			} else {
+				this.ctx.fillStyle = model.palette[id].colour;
+			}
+			this.drawRectOnView(i * sqSize, k * sqSize, sqSize - 1, sqSize - 1);
         }
     }
 }

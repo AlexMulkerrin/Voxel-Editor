@@ -37,6 +37,17 @@ function toRGBString(red, green, blue) {
     return colourString;
 }
 
+function colourBlend(colour1, colour2) {
+	var components1=[];
+	components1 = colourComponents(colour1);
+	var components2=[];
+	components2 = colourComponents(colour2);
+	for (var i=0; i<components1.length; i++) {
+		components1[i] = Math.floor((components1[i]+components2[i])/2);
+	}
+	return toRGBString(components1[0],components1[1],components1[2]);
+}
+
 function getIDfromSymbol(symbol) {
 	switch (symbol) {
 		case "A":
