@@ -1,0 +1,4 @@
+{"created with":"Voxel Editor v0.3","creation date":"2016-05-10T12:16:58.377Z",
+"width":8,"height":8,"depth":8,
+"palette":[{"name":"air","symbol":"A","material":"gas","colour":"#ddddff"},{"name":"water","symbol":"B","material":"liquid","colour":"#f7f7ff"},{"name":"block #1","symbol":"C","material":"solid","colour":"#767473"},{"name":"block #2","symbol":"D","material":"solid","colour":"#dd7200"},{"name":"block #3","symbol":"E","material":"solid","colour":"#8c6614"},{"name":"block #4","symbol":"F","material":"solid","colour":"#d0c49b"},{"name":"block #5","symbol":"G","material":"solid","colour":"#5a3c00"},{"name":"block #6","symbol":"H","material":"solid","colour":"#912621"}],
+"RunLengthEncoded blocks":"8CG6C2GFB2FBF9G8D24AC6H2C6ACF6AFG6AGF6AF8D16AC6H2C6AGB6A2G6A2G6A2G6AG8D8AC6H2C6AEF6AEG6AGB6ABG6AGF6AF8DC6H2C6AEF6AEG6AGB6ABG6AGF6AF8DC6H2C6AGB6A2G6A2G6A2G6AG8D8AC6H2C6ACF6AFG6AGF6AF8D16A8CG6C2GFB2FBF9G8D24A"}
