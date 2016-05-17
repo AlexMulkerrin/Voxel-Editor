@@ -24,6 +24,7 @@ Program.prototype.createOpenPrompt = function () {
 	input.setAttribute("type", "file");
 	document.body.appendChild(input);
 	input.onchange = function (event) {
+		t.schematic.fileName = input.value
 		if (getFileNameExtension(input.value) === "png") {
 			t.loadEncodedImage(input);
 		} else {
@@ -39,10 +40,7 @@ Program.prototype.loadJSON = function(fileInput) {
 	var t = this;
 	fileReader.onload = function(fileLoadedEvent) {
 		var loadedText = fileLoadedEvent.target.result;
-		var resultJSON = JSON.parse(loadedText);
-		t.schematic.readJSON(resultJSON);
-		t.control.view.sliceHeight = 0;
-		t.display.updatePalette();
+		t.handleLoadedText(loadedText);
 	};
 	fileReader.readAsText(file, "UTF-8");
 }
@@ -55,19 +53,24 @@ Program.prototype.loadEncodedImage = function(fileInput) {
 		image.src = event.target.result;
 		image.onload = function() {
 			var decodedText = t.decodeTextFromImage(image);
-			var resultJSON = JSON.parse(decodedText);
-			t.schematic.readJSON(resultJSON);
-			t.control.view.sliceHeight = 0;
-			t.display.updatePalette();
+			t.handleLoadedText(decodedText);
 		}
 	};
 	fileReader.readAsDataURL(file);
 }
+Program.prototype.handleLoadedText = function(loadedText) {
+	var resultJSON = JSON.parse(loadedText);
+		this.schematic.readJSON(resultJSON);
+		this.control.view.sliceHeight = 0;
+		this.control.currentPalette = 2;
+		this.display.updatePalette();
+		this.control.createButtons();
+}	
 
 Program.prototype.saveJSON = function() {
 	var text = this.schematic.createJSON();
 	var textBlob = new Blob([text], {type:'text/json'});
-	var fileName = "VoxelSchematic.json";
+	var fileName = this.schematic.fileName;
 	var textData = window.URL.createObjectURL(textBlob);
 	this.createDownloadPrompt(fileName, textData);
 }
@@ -77,7 +80,7 @@ Program.prototype.saveImage = function() {
 	var encodedImage = this.encodeTextIntoImage(schematicImage, text);
 
     var imageData = encodedImage.toDataURL("image/png");
-	var fileName = "VoxelSchematic";
+	var fileName = this.schematic.fileName;
 	this.createDownloadPrompt(fileName, imageData);
 }
 Program.prototype.createDownloadPrompt = function(name, contents) {

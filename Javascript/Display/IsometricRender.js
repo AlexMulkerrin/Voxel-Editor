@@ -71,7 +71,7 @@ IsometricRender.prototype.updateRender = function() {
   this.outputImage.width = model.width*4 + model.depth*4 + 8;
   this.outputImage.height = model.width*2 + model.height*3 + model.depth*2 + 8;
   var ctx = this.outputImage.getContext("2d");
-  ctx.fillStyle= model.palette[0].colour
+  ctx.fillStyle= model.palette[0].colour;
   ctx.fillRect(0,0,this.outputImage.width,this.outputImage.height)
 
   var nx, nz;

@@ -71,5 +71,4 @@ function getIDfromSymbol(symbol) {
 
 function getFileNameExtension(fileName) {
 	return extension = fileName.split(".").pop();
-
 }

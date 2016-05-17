@@ -47,9 +47,13 @@ Display.prototype.refresh = function() {
   this.drawInterface();
   this.drawButtons();
   this.drawPalette();
+
+
   this.drawInfo();
   this.drawTooltips();
   this.drawCursor();
+
+  this.drawSideBar();
 
 }
 
@@ -101,6 +105,7 @@ Display.prototype.drawIsometricRender = function() {
 
 Display.prototype.drawInterface = function () {
     var c = this.canvas;
+	var view = this.targetControl.view;
     // top info bar
     this.drawRectangle(0, 0, c.width, 21, "#DBE8F5");
     this.drawRectangle(0, 21, c.width, 1, "#365D90");
@@ -108,11 +113,12 @@ Display.prototype.drawInterface = function () {
     this.drawRectangle(0, 22, c.width, 25, "#FBFDFF");
     this.drawRectangle(0, 47, c.width, 1, "#9FAEC2");
     // vertical scrollbar
-    this.drawRectangle(c.width - 16, 48, 16, c.height - 90, "#fcfcfc");
-    this.drawRectangle(c.width - 17, 48, 1, c.height - 90, "#9FAEC2");
+    this.drawRectangle(c.width - view.borderRight, 48, 16, c.height - 90, "#fcfcfc");
+    this.drawRectangle(c.width - (1+view.borderRight), 48, 1, c.height - 90, "#9FAEC2");
+	this.drawRectangle(c.width + 16 - view.borderRight, 48, 1, c.height - 58, "#9FAEC2");
     // horizontal scrollbar
-    this.drawRectangle(0, c.height - 42, c.width, 16, "#fcfcfc");
-    this.drawRectangle(0, c.height - 43, c.width - 16, 1, "#9FAEC2");
+    this.drawRectangle(0, c.height - 42, c.width + 16 - view.borderRight, 16, "#fcfcfc");
+    this.drawRectangle(0, c.height - 43, c.width - view.borderRight, 1, "#9FAEC2");
     // bottom info bar
     this.drawRectangle(0, c.height - 25, c.width, 25, "#FBFDFF");
     this.drawRectangle(0, c.height - 26, c.width, 1, "#919191");
@@ -186,6 +192,29 @@ Display.prototype.drawPalette = function () {
 	this.ctx.fillRect(244+colour[0]/step, 24,2,22);
 	this.ctx.fillRect(364+colour[1]/step,24,2,22);
 	this.ctx.fillRect(484+colour[2]/step,24,2,22);
+}
+
+Display.prototype.drawSideBar = function() {
+	var palette = this.targetSchematic.palette;
+	var px = this.canvas.width-200;
+	var py = 400;
+	var x=0, y=0;
+	for (var i=0; i<palette.length; i++) {
+		this.ctx.fillStyle = palette[i].colour;
+		this.ctx.fillRect(px+x*24, py+y*24, 16, 16);
+		x++;
+		if (x>7) {
+			x=0;
+			y++;
+		}
+	}
+	var current = this.targetControl.currentPalette;
+	var palette = this.targetSchematic.palette;
+	this.ctx.fillStyle = "#000033";
+    this.ctx.fillText("Currently selected block: "+current, px, 200);
+	this.ctx.fillText("name: "+palette[current].name, px, 220);
+	this.ctx.fillText("material: "+palette[current].material, px, 240);
+	this.ctx.fillText("colour code: "+palette[current].colour, px, 260);
 
 }
 
@@ -202,7 +231,7 @@ Display.prototype.drawInfo = function () {
     // top bar info
     this.ctx.fillStyle = "#000033";
     this.ctx.fillText("Edit", 5, 13);
-    this.ctx.fillText("*Schematic.png - Voxel Editor v0.2", 45, 13);
+    this.ctx.fillText("*"+this.targetSchematic.fileName+" - Voxel Editor v0.3", 45, 13);
 
     this.ctx.fillText("Current block: "+this.targetSchematic.palette[this.targetControl.currentPalette].material, 123, 38);
 	this.ctx.fillText("R: ", 232, 38);

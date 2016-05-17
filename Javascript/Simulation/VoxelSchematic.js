@@ -1,8 +1,9 @@
 function VoxelSchematic(width, height, depth) {
+  this.fileName = "schematic";
   this.width = width;
   this.height = height;
   this.depth = depth;
-  this.palette = defaultPalette();
+  this.palette = creativePalette();
 
   this.block = create3DArray(width, height, depth, 0);
   this.visible = create3DArray(width, height, depth, false);
@@ -28,8 +29,13 @@ VoxelSchematic.prototype.clear = function() {
   this.checkVisible();
 }
 
-VoxelSchematic.prototype.decreaseSize = function() {
+VoxelSchematic.prototype.extendPalette = function() {
+	var index = this.palette.length;
+	var newEntry = {name:"block #"+index, material:"solid", colour:"#ff00ff"};
+	this.palette.push(newEntry);
+}
 
+VoxelSchematic.prototype.decreaseSize = function() {
 	this.width = this.width-1;
 	if (this.width == 0) this.width = 1;
 	this.height = this.height-1;

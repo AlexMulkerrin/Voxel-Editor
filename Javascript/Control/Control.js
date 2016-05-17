@@ -11,7 +11,7 @@ function Control(canvasName, schematic, program) {
 	this.select = "none";
 
 	this.currentPalette = 2;
-	this.currentColour = colourComponents(this.targetSchematic.palette[0].colour);
+	this.currentColour = colourComponents(this.targetSchematic.palette[this.currentPalette].colour);
 
 	this.createButtons();
 	this.createKeyboardEventHandlers();
@@ -241,7 +241,7 @@ function View() {
 
     this.borderTop = 53;
     this.borderLeft = 5;
-    this.borderRight = 22;
+    this.borderRight = 232;
     this.borderBottom = 48;
 
     this.pixelPerCell = 16;
@@ -262,21 +262,29 @@ Control.prototype.createButtons = function () {
 
     // palette
 	var palette = this.targetSchematic.palette;
+	var px = this.targetCanvas.width-203;
+	var py = 397;
+	var x=0, y=0;
 	for (var i=0; i<palette.length; i++) {
-		this.button.push(  new Button(654+i*24, 24, 22, 22, null, i+1, "selectPalette", i) );
+		this.button.push(  new Button(px+x*24, py+y*24, 22, 22, null, i+1, "selectPalette", i) );
+		x++;
+		if (x>7) {
+			x=0;
+			y++;
+		}
 	}
 	// colour sliders
-	this.button.push(  new Button(244, 24, 100, 22, null, "", "changeColour", 0) );
-	this.button.push(  new Button(364, 24, 100, 22, null, "", "changeColour", 1) );
-	this.button.push(  new Button(484, 24, 100, 22, null, "", "changeColour", 2) );
+	this.button.push(  new Button(px, 300, 160, 22, null, "", "changeColour", 0) );
+	this.button.push(  new Button(px, 330, 160, 22, null, "", "changeColour", 1) );
+	this.button.push(  new Button(px, 360, 160, 22, null, "", "changeColour", 2) );
 
     // viewport controls
     this.button.push(  new Button(c.width - 21, 1, 20, 20, 13, "F", "fullscreen") );
 
-    this.button.push(  new Button(c.width - 16, 48, 16, 16, 15, "W", "scrollUp") );
-    this.button.push(  new Button(c.width - 16, c.height - 58, 16, 16, 16, "S", "scrollDown") );
+    this.button.push(  new Button(c.width - this.view.borderRight, 48, 16, 16, 15, "W", "scrollUp") );
+    this.button.push(  new Button(c.width - this.view.borderRight, c.height - 58, 16, 16, 16, "S", "scrollDown") );
     this.button.push(  new Button(0, c.height - 42, 16, 16, 17, "A", "scrollLeft") );
-    this.button.push(  new Button(c.width - 32, c.height - 42, 16, 16, 18, "D", "scrollRight") );
+    this.button.push(  new Button(c.width - (16+this.view.borderRight), c.height - 42, 16, 16, 18, "D", "scrollRight") );
 
     // size and scale
     //this.button.push(  new Button(3, c.height - 23, 20, 20, 19, "resize") );
@@ -292,10 +300,10 @@ Control.prototype.createButtons = function () {
     this.button.push(  new Button(c.width - 22, c.height - 23, 20, 20, 23, "L", "zoomOut") );
 
     // scrollbar sections
-    this.button.push( new Button(c.width - 16, 64, 16, 16, null, "W", "scrollUp") );
-    this.button.push(  new Button(c.width - 16, c.height - 74, 16, 16, null, "S", "scrollDown") );
+    this.button.push( new Button(c.width - this.view.borderRight, 64, 16, 16, null, "W", "scrollUp") );
+    this.button.push(  new Button(c.width - this.view.borderRight, c.height - 74, 16, 16, null, "S", "scrollDown") );
     this.button.push(  new Button(16, c.height - 42, 16, 16, null, "A", "scrollLeft") );
-    this.button.push(  new Button(c.width - 48, c.height - 42, 16, 16, null, "D", "scrollRight") );
+    this.button.push(  new Button(c.width - (32+this.view.borderRight), c.height - 42, 16, 16, null, "D", "scrollRight") );
 
     // file tab button
   //  this.button[27] = new Button(1, 1, 30, 19, null, "fileMenu");
@@ -346,16 +354,22 @@ Control.prototype.selectPalette = function(id) {
     this.button[this.mouse.selected].isSelected = true;
 	this.currentColour = colourComponents(this.targetSchematic.palette[id].colour);
 }
+Control.prototype.extendPalette = function() {
+	this.currentPalette = this.targetSchematic.palette.length;
+	this.targetSchematic.extendPalette();
+	this.repositionButtons();
+
+	this.button[this.mouse.selected].isSelected = false;
+    this.mouse.selected = currentPalette + 4;
+    this.button[this.mouse.selected].isSelected = true;
+	this.currentColour = colourComponents(this.targetSchematic.palette[currentPalette].colour);
+
+}
 Control.prototype.changeColour = function(colourID) {
-	var step = 255/100;
-	var newValue = 0;
-	if (colourID == 0) {
-		newValue = Math.floor((this.mouse.x - 244)*step);
-	} else if (colourID == 1) {
-		newValue = Math.floor((this.mouse.x - 364)*step);
-	}  else if (colourID == 2) {
-		newValue = Math.floor((this.mouse.x - 484)*step);
-	}
+	var targetButton = this.button[this.mouse.newSelected];
+	var step = 255/targetButton.width;
+	var newValue = Math.floor((this.mouse.x - targetButton.x)*step);
+
 	this.currentColour[colourID] = newValue;
 	var id = this.currentPalette ;
 	var colour = this.currentColour;
