@@ -48,25 +48,21 @@ function colourBlend(colour1, colour2) {
 	return toRGBString(components1[0],components1[1],components1[2]);
 }
 
-function getIDfromSymbol(symbol) {
-	switch (symbol) {
-		case "A":
-			return 0;
-		case "B":
-			return 1;
-		case "C":
-			return 2;
-		case "D":
-			return 3;
-		case "E":
-			return 4;
-		case "F":
-			return 5;
-		case "G":
-			return 6;
-		case "H":
-			return 7;
+function getSymbolList(length) {
+	var letters = ['a', 'b', 'c', 'd', 'e', 'f', 'g', 'h', 'i', 'j', 'k', 'l', 'm', 'n', 'o', 'p', 'q', 'r', 's', 't', 'u', 'v','w', 'x', 'y', 'z'];
+	var nextSymbol;
+	var resultList = [];
+	for (var i=0; i<length; i++) {
+		if (i>=letters.length) {
+			var index = Math.floor(i/letters.length) - 1;
+			nextSymbol = letters[index].toUpperCase();
+			nextSymbol += letters[i % letters.length];
+		} else {
+		 nextSymbol = letters[i].toUpperCase();
+	 	}
+		resultList.push(nextSymbol);
 	}
+	return resultList;
 }
 
 function getFileNameExtension(fileName) {

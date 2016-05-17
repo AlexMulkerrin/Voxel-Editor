@@ -273,6 +273,10 @@ Control.prototype.createButtons = function () {
 			y++;
 		}
 	}
+	// edit palette buttons
+	this.button.push(  new Button(px+x*24, py+y*24, 22, 22, 14, "", "extendPalette") );
+	this.button.push(  new Button(c.width-33, 186, 22, 22, 8, "", "removePalette") );
+
 
 	// viewport options
 	this.button.push( new Button(155, 24, 36, 22, null, "", "noEffect") );
@@ -381,11 +385,27 @@ Control.prototype.extendPalette = function() {
 	this.repositionButtons();
 
 	this.button[this.mouse.selected].isSelected = false;
-    this.mouse.selected = currentPalette + 4;
+    this.mouse.selected = this.currentPalette + 4;
     this.button[this.mouse.selected].isSelected = true;
-	this.currentColour = colourComponents(this.targetSchematic.palette[currentPalette].colour);
+	this.currentColour = colourComponents(this.targetSchematic.palette[this.currentPalette].colour);
+	this.targetDisplay.updatePalette();
 
 }
+
+Control.prototype.removePalette = function() {
+	if (this.currentPalette>0) {
+		this.targetSchematic.removePaletteEntry(this.currentPalette);
+
+		this.currentPalette = 0;
+		this.repositionButtons();
+		this.button[this.mouse.selected].isSelected = false;
+	    this.mouse.selected = this.currentPalette + 4;
+	    this.button[this.mouse.selected].isSelected = true;
+		this.currentColour = colourComponents(this.targetSchematic.palette[this.currentPalette].colour);
+		this.targetDisplay.updatePalette();
+	}
+}
+
 Control.prototype.changeColour = function(colourID) {
 	var targetButton = this.button[this.mouse.newSelected];
 	var step = 255/targetButton.width;

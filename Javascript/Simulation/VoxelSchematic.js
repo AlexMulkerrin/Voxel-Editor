@@ -35,6 +35,25 @@ VoxelSchematic.prototype.extendPalette = function() {
 	this.palette.push(newEntry);
 }
 
+VoxelSchematic.prototype.removePaletteEntry = function(id) {
+	this.palette.splice(id, 1);
+	for (var i=0; i<this.width; i++) {
+		for (var j=0; j<this.height; j++) {
+			for (var k=0; k<this.depth; k++) {
+				if (this.block[i][j][k] === id) {
+					this.block[i][j][k]=0
+				} else if ( this.block[i][j][k] > id) {
+					this.block[i][j][k]--;
+				}
+			}
+		}
+	}
+
+	//var index = this.palette.length;
+	//var newEntry = {name:"block #"+index, material:"solid", colour:"#ff00ff"};
+	//this.palette.push(newEntry);
+}
+
 VoxelSchematic.prototype.decreaseSize = function() {
 	this.width = this.width-1;
 	if (this.width == 0) this.width = 1;
@@ -96,7 +115,7 @@ VoxelSchematic.prototype.setVolume = function(start, end, id) {
 }
 
 VoxelSchematic.prototype.runLengthEncodeBlockArray = function() {
-	var symbolList = ["A","B","C","D","E","F","G","H"];
+	var symbolList = getSymbolList(this.palette.length);
 	var result = "";
 	var currentID = this.block[0][0][0];
 	var currentRunLength = 0;
@@ -130,9 +149,26 @@ VoxelSchematic.prototype.createJSON = function() {
 	result +='"width":'+this.width+',';
 	result +='"height":'+this.height+',';
 	result +='"depth":'+this.depth+',\n';
-	result +='"palette":'+JSON.stringify(this.palette)+',\n';
+	result +='"palette":'+this.generatePaletteJSON();//JSON.stringify(this.palette)+',\n';
 	result +='"RunLengthEncoded blocks":"'+this.runLengthEncodeBlockArray()+'"';
 	result +='}';
+	return result;
+}
+
+VoxelSchematic.prototype.generatePaletteJSON = function() {
+	var result = '[\n';
+	var symbolList = getSymbolList(this.palette.length);
+	for (var i=0; i<this.palette.length; i++) {
+		var blockType = this.palette[i];
+		if (i>0) result+=',\n';
+		result +='{';
+		result +='"name":"'+blockType.name+'",';
+		result +='"symbol":"'+symbolList[i]+'",';
+		result +='"material":"'+blockType.material+'",';
+		result +='"colour":"'+blockType.colour+'"';
+		result +='}';
+	}
+	result +='],\n';
 	return result;
 }
 
@@ -141,23 +177,36 @@ VoxelSchematic.prototype.readJSON = function(JSONtext) {
 	this.height = JSONtext.height;
 	this.depth = JSONtext.depth;
 
-	this.block = this.readRunLengthEncoding(JSONtext["RunLengthEncoded blocks"]);
 	this.palette = JSONtext.palette;
+	this.block = this.readRunLengthEncoding(JSONtext["RunLengthEncoded blocks"]);
+
 	this.visible = create3DArray(this.width, this.height, this.depth, false);
 	this.checkVisible();
 }
 VoxelSchematic.prototype.readRunLengthEncoding = function(JSONtext) {
 	var x=0; y=0; z=0;
+	var symbolList = getSymbolList(this.palette.length);
 	var result = create3DArray(this.width, this.height, this.depth,0);
 	var currentCount ="";
 	var runLength = 0;
 	var currentID = 2;
-	var currentChar= "";
-	for (var i=0; i<JSONtext.length; i++) {
-		currentChar = JSONtext.charAt(i);
-		if (isNaN(parseInt(currentChar)) ) {
+	var currentSymbol= "";
+	var nextChar = "";
 
-			currentID = getIDfromSymbol(currentChar);
+	var i=0;
+	while (i < JSONtext.length) {
+		currentSymbol = JSONtext.charAt(i);
+		if (isNaN(parseInt(currentSymbol)) ) {
+			// check to see if multi letter symbol
+			if (i<JSONtext.length-1) {
+				nextChar = JSONtext.charAt(i+1);
+				if (isNaN(parseInt(nextChar)) && nextChar === nextChar.toLowerCase()) {
+					currentSymbol += nextChar;
+					i++;
+				}
+			}
+
+			currentID = symbolList.indexOf(currentSymbol);
 			runLength = parseInt(currentCount);
 			if (isNaN(runLength)) runLength = 1;
 			for (var j=0; j<runLength; j++) {
@@ -174,8 +223,9 @@ VoxelSchematic.prototype.readRunLengthEncoding = function(JSONtext) {
 			}
 			currentCount = "";
 		} else {
-			currentCount += currentChar;
+			currentCount += currentSymbol;
 		}
+		i++;
 	}
 	return result;
 }
