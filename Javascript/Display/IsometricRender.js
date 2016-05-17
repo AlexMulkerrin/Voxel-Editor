@@ -75,19 +75,21 @@ IsometricRender.prototype.updateRender = function() {
   ctx.fillRect(0,0,this.outputImage.width,this.outputImage.height)
 
   var nx, nz;
+  var xxcomp = rotationTransforms[this.rotation][0][0];
+  var xzcomp = rotationTransforms[this.rotation][0][1];
+  var zxcomp = rotationTransforms[this.rotation][1][0];
+  var zzcomp = rotationTransforms[this.rotation][1][1];
+
   for (var i=0; i<model.width; i++) {
     for (var k=0; k<model.depth; k++) {
       for (var j=0; j<model.height; j++) {
 
-        var xxcomp = rotationTransforms[this.rotation][0][0];
-        var xzcomp = rotationTransforms[this.rotation][0][1];
-	var zxcomp = rotationTransforms[this.rotation][1][0];
-	var zzcomp = rotationTransforms[this.rotation][1][1];
+
 
         nx =  xxcomp<0 ? model.width - (1+i) : i*xxcomp;
         nx += xzcomp<0 ? model.depth - (1+k) : k*xzcomp;
         nz =  zxcomp<0 ? model.width - (1+i) : i*zxcomp;
-        nz += zzcomp<0 ? model.depth - (i+k) : k*zzcomp;
+        nz += zzcomp<0 ? model.depth - (1+k) : k*zzcomp;
 
         var id = model.block[nx][j][nz];
         var material = model.palette[id].material;

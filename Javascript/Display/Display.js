@@ -46,14 +46,13 @@ Display.prototype.refresh = function() {
   this.drawIsometricRender();
   this.drawInterface();
   this.drawButtons();
-  this.drawPalette();
-
-
-  this.drawInfo();
-  this.drawTooltips();
-  this.drawCursor();
 
   this.drawSideBar();
+  this.drawColourPicker();
+  this.drawInfo();
+
+  this.drawTooltips();
+  this.drawCursor();
 
 }
 
@@ -94,12 +93,15 @@ Display.prototype.drawSlice = function() {
 }
 
 Display.prototype.drawIsometricRender = function() {
-  var tx = this.canvas.width - this.render.outputImage.width;
-  this.ctx.drawImage(this.render.outputImage, tx-17, 48);
+	this.drawRectangle(this.canvas.width-215, 48, 215, 132, this.targetSchematic.palette[0].colour);
+  var tx = (215 - this.render.outputImage.width)/2;
+  var ty = (178 - this.render.outputImage.height);
+  this.ctx.drawImage(this.render.outputImage, (this.canvas.width-215)+tx, ty);
 
-  this.ctx.fillStyle = "#9FAEC2";
-  this.ctx.fillRect(tx-17, 48, 1, this.render.outputImage.height);
-  this.ctx.fillRect(tx-17, 48+this.render.outputImage.height, this.render.outputImage.width, 1);
+  //this.ctx.fillStyle = "#9FAEC2";
+  //this.ctx.fillRect(tx-17, 48, 1, this.render.outputImage.height);
+ // this.ctx.fillRect(tx-17, 48+this.render.outputImage.height, this.render.outputImage.width, 1);
+	this.drawRectangle(this.canvas.width-215, 179, 215, 1, "#9FAEC2");
 
 }
 
@@ -125,13 +127,16 @@ Display.prototype.drawInterface = function () {
     // tool bar dividers
     this.ctx.fillStyle = "#9FAEC2";
     this.ctx.fillRect(107, 29, 1, 13);
-    this.ctx.fillRect(598, 29, 1, 13);
+    this.ctx.fillRect(370, 29, 1, 13);
     //this.ctx.fillRect(289, 29, 1, 13);
     // bottom bar dividers
     this.ctx.fillStyle = "#9FAEC2";
     this.ctx.fillRect(132, c.height - 19, 1, 13);
 	this.ctx.fillRect(335, c.height - 19, 1, 13);
     this.ctx.fillRect(c.width - 122, c.height - 19, 1, 13);
+	// sidebar background
+	this.drawRectangle(this.canvas.width-215, 180, 215, this.canvas.height-206, "#FBFDFF");
+
 }
 Display.prototype.drawButtons = function () {
     for (var i = 0; i < this.targetControl.button.length; i++) {
@@ -160,40 +165,6 @@ Display.prototype.drawButton = function (button) {
     }
 }
 
-Display.prototype.drawPalette = function () {
-	var palette = this.targetSchematic.palette;
-
-	this.ctx.fillStyle = palette[this.targetControl.currentPalette].colour;
-	//this.ctx.fillRect(210, 27, 16, 16);
-
-	for (var i=0; i<palette.length; i++) {
-		this.ctx.fillStyle = palette[i].colour;
-		this.ctx.fillRect(657+i*24, 27, 16, 16);
-	}
-
-	var colour = this.targetControl.currentColour;
-	var length = 100;
-	var step = 255/length;
-
-	for (var i=0; i<length; i++) {
-		var newRed = Math.floor(step*i);
-		this.ctx.fillStyle = toRGBString(newRed,colour[1],colour[2]);
-		this.ctx.fillRect(244+i, 24,1,21);
-
-		var newGreen = Math.floor(step*i);
-		this.ctx.fillStyle = toRGBString(colour[0], newGreen, colour[2]);
-		this.ctx.fillRect(364+i,24,1,21);
-
-		var newBlue = Math.floor(step*i);
-		this.ctx.fillStyle = toRGBString(colour[0], colour[1], newBlue);
-		this.ctx.fillRect(484+i,24,1,21);
-	}
-	this.ctx.fillStyle = "#22BCFE";
-	this.ctx.fillRect(244+colour[0]/step, 24,2,22);
-	this.ctx.fillRect(364+colour[1]/step,24,2,22);
-	this.ctx.fillRect(484+colour[2]/step,24,2,22);
-}
-
 Display.prototype.drawSideBar = function() {
 	var palette = this.targetSchematic.palette;
 	var px = this.canvas.width-200;
@@ -210,12 +181,40 @@ Display.prototype.drawSideBar = function() {
 	}
 	var current = this.targetControl.currentPalette;
 	var palette = this.targetSchematic.palette;
+
+	this.ctx.fillStyle = palette[current].colour;
+	this.ctx.fillRect(px+140, 188, 16, 16);
+
 	this.ctx.fillStyle = "#000033";
-    this.ctx.fillText("Currently selected block: "+current, px, 200);
+    this.ctx.fillText("Currently selected block: #"+current, px, 200);
 	this.ctx.fillText("name: "+palette[current].name, px, 220);
 	this.ctx.fillText("material: "+palette[current].material, px, 240);
 	this.ctx.fillText("colour code: "+palette[current].colour, px, 260);
+}
 
+Display.prototype.drawColourPicker = function() {
+	var colour = this.targetControl.currentColour;
+	var length = 160;
+	var step = 255/length;
+	var px = this.canvas.width-183;
+
+	for (var i=0; i<length; i++) {
+		var newRed = Math.floor(step*i);
+		this.ctx.fillStyle = toRGBString(newRed,colour[1],colour[2]);
+		this.ctx.fillRect(px+i, 270,1,21);
+
+		var newGreen = Math.floor(step*i);
+		this.ctx.fillStyle = toRGBString(colour[0], newGreen, colour[2]);
+		this.ctx.fillRect(px+i,300,1,21);
+
+		var newBlue = Math.floor(step*i);
+		this.ctx.fillStyle = toRGBString(colour[0], colour[1], newBlue);
+		this.ctx.fillRect(px+i,330,1,21);
+	}
+	this.ctx.fillStyle = "#22BCFE";
+	this.ctx.fillRect(px+colour[0]/step, 269,2,22);
+	this.ctx.fillRect(px+colour[1]/step,299,2,22);
+	this.ctx.fillRect(px+colour[2]/step,329,2,22);
 }
 
 Display.prototype.drawRectOnView = function(x,y,w,h) {
@@ -233,11 +232,21 @@ Display.prototype.drawInfo = function () {
     this.ctx.fillText("Edit", 5, 13);
     this.ctx.fillText("*"+this.targetSchematic.fileName+" - Voxel Editor v0.3", 45, 13);
 
-    this.ctx.fillText("Current block: "+this.targetSchematic.palette[this.targetControl.currentPalette].material, 123, 38);
-	this.ctx.fillText("R: ", 232, 38);
-	this.ctx.fillText("G: ", 352, 38);
-	this.ctx.fillText("B: ", 472, 38);
-	this.ctx.fillText("Palette: ", 612, 38);
+	this.ctx.fillText("View: ", 120, 38);
+	this.ctx.fillText("Slice", 160, 38);
+	this.ctx.fillText("Isometric", 200, 38);
+    this.ctx.fillText("3D render", 260, 38);
+	this.ctx.fillText("Details", 320, 38);
+
+
+	var px = this.canvas.width-203;
+	this.ctx.fillText("R: ", px, 284);
+	this.ctx.fillText("G: ", px, 314);
+	this.ctx.fillText("B: ", px, 344);
+	this.ctx.fillText("Palette: ", px, 390);
+	this.ctx.fillStyle = "#9FAEC2";
+	this.ctx.fillRect( px, 368, this.canvas.width-(px+5), 1);
+	this.ctx.fillStyle = "#000033";
 
     // bottom bar info
     this.ctx.fillText("size: " + this.targetSchematic.width + " x " + this.targetSchematic.height + " x " + this.targetSchematic.depth, 5, c.height - 10);

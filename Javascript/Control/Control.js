@@ -273,10 +273,21 @@ Control.prototype.createButtons = function () {
 			y++;
 		}
 	}
+
+	// viewport options
+	this.button.push( new Button(155, 24, 36, 22, null, "", "noEffect") );
+    this.button.push( new Button(195, 24, 56, 22, null, "", "noEffect") );
+    this.button.push( new Button(255, 24, 55, 22, null, "", "noEffect") );
+	this.button.push( new Button(315, 24, 42, 22, null, "", "noEffect") );
+
+	// rotation buttons
+	this.button.push( new Button(c.width-214, 156, 22, 22, 9, "", "rotateRender", -1) );
+    this.button.push( new Button(c.width-23, 156, 22, 22, 10, "", "rotateRender", 1) );
+
 	// colour sliders
-	this.button.push(  new Button(px, 300, 160, 22, null, "", "changeColour", 0) );
-	this.button.push(  new Button(px, 330, 160, 22, null, "", "changeColour", 1) );
-	this.button.push(  new Button(px, 360, 160, 22, null, "", "changeColour", 2) );
+	this.button.push(  new Button(px+20, 270, 160, 22, null, "", "changeColour", 0) );
+	this.button.push(  new Button(px+20, 300, 160, 22, null, "", "changeColour", 1) );
+	this.button.push(  new Button(px+20, 330, 160, 22, null, "", "changeColour", 2) );
 
     // viewport controls
     this.button.push(  new Button(c.width - 21, 1, 20, 20, 13, "F", "fullscreen") );
@@ -344,6 +355,16 @@ Control.prototype.saveAsJSON = function() {
 Control.prototype.saveAsImage = function() {
     this.select = "save file";
     this.targetProgram.saveImage();
+}
+
+// rotate isometric render
+Control.prototype.rotateRender = function(direc) {
+	var rotation = this.targetDisplay.render.rotation;
+	rotation += direc;
+	if (rotation < 0) rotation = 3;
+	if (rotation > 3) rotation = 0;
+	this.targetDisplay.render.rotation = rotation;
+	this.targetDisplay.updateRender();
 }
 
 // palette editing
@@ -427,7 +448,6 @@ Control.prototype.decreaseSize = function() {
 	this.targetDisplay.updateRender();
 }
 Control.prototype.noEffect = function() {
-
 }
 
 // change displayed slice

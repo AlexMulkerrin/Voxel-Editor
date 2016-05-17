@@ -19,7 +19,7 @@ function defaultPalette() {
 
 function creativePalette() {
 	return[
-		{name:"air", 		symbol:"A",		colour:"#ffffff", material:"gas"},
+		{name:"air", 		symbol:"A",		colour:"#ddddff", material:"gas"},
 		{name:"stone", 		symbol:"B", 	colour:"#7f7f7f", material:"solid"},
 		{name:"grass", 		symbol:"C", 	colour:"#9ccb6c", material:"solid"},
 		{name:"dirt", 		symbol:"D", 	colour:"#79553a", material:"solid"},
@@ -34,7 +34,7 @@ function creativePalette() {
 		{name:"sand", 		symbol:"M", 	colour:"#ffffd1", material:"solid"},
 		{name:"gravel", 	symbol:"N", 	colour:"#a5a1a1", material:"solid"},
 		{name:"goldOre", 	symbol:"O", 	colour:"#fcee4b", material:"solid"},
-		{name:"ironOre", 	symbol:"P", 	colour:"#eeeeee", material:"solid"},
+		{name:"ironOre", 	symbol:"P", 	colour:"#eeeeee", material:"solid"},/*
 		{name:"coalOre", 	symbol:"Q", 	colour:"#373737", material:"solid"},
 		{name:"treeTrunk", 	symbol:"R", 	colour:"#79553a", material:"solid"},
 		{name:"leaves", 	symbol:"S", 	colour:"#46cf2d", material:"liquid"},
@@ -85,6 +85,6 @@ function creativePalette() {
 		{name:"pillar", 	symbol:"Bl", 	colour:"#000000", material:"solid"},
 		{name:"crate", 		symbol:"Bm", 	colour:"#000000", material:"solid"},
 		{name:"stoneBrick", symbol:"Bn", 	colour:"#bbbbbb", material:"solid"}
-
+*/
 	]
 }
