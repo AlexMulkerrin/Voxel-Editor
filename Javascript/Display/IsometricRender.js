@@ -7,12 +7,14 @@ function IsometricRender(schematic) {
 
   this.outputImage = document.createElement('canvas');
   this.tileSheet = document.createElement('canvas');
+  this.tileSize = 0;
 
   this.blockImage = new Image();
   this.blockImage.crossOrigin = "Anonymous";
-  this.blockImage.src = "Resources/Images/IsometricBlock.png";
+  this.blockImage.src = "Resources/Images/GiantWoolTexture.png";
   var t = this;
   this.blockImage.onload = function() {
+	  t.tileSize = 50;//t.blockImage.width;
 	  t.createRender();
   }
 }
@@ -28,12 +30,12 @@ IsometricRender.prototype.createRender = function () {
 // colouration present in schematic palette.
 IsometricRender.prototype.createTileSheet = function (sourceImage) {
   var palette = this.targetSchematic.palette;
-  this.tileSheet.width = palette.length*8;
-  this.tileSheet.height = 8;
+  this.tileSheet.width = palette.length*this.tileSize;
+  this.tileSheet.height = this.tileSize;
   var ctx = this.tileSheet.getContext("2d");
 
-  ctx.drawImage(this.blockImage, 0, 0, 8, 8);
-  var imageData = ctx.getImageData(0, 0, 8, 8);
+  ctx.drawImage(this.blockImage, 0, 0, this.tileSize, this.tileSize);
+  var imageData = ctx.getImageData(0, 0, this.tileSize, this.tileSize);
   var data = imageData.data;
 
   for (var i=0; i<palette.length; i++) {
@@ -56,7 +58,7 @@ IsometricRender.prototype.createTileSheet = function (sourceImage) {
       data[j+2] = Math.floor(blue);
     }
 
-    ctx.putImageData(imageData, i*8, 0);
+    ctx.putImageData(imageData, i*this.tileSize, 0);
     for (var j=0; j<data.length; j++) {
       data[j] = oldData[j];
     }
@@ -67,9 +69,13 @@ IsometricRender.prototype.createTileSheet = function (sourceImage) {
 IsometricRender.prototype.updateRender = function() {
   var rotationTransforms = [ [[1,0],[0,1]], [[0,-1],[1,0]], [[-1,0],[0,-1]], [[0,1],[-1,0]] ];
 
+	var size = this.tileSize;
+	var half = Math.floor(size/2);
+	var quarter = Math.floor(size/4);
+
   var model = this.targetSchematic;
-  this.outputImage.width = model.width*4 + model.depth*4 + 8;
-  this.outputImage.height = model.width*2 + model.height*3 + model.depth*2 + 8;
+  this.outputImage.width = model.width*half + model.depth*half + size;
+  this.outputImage.height = model.width*quarter + model.height*half + model.depth*quarter + size;
   var ctx = this.outputImage.getContext("2d");
   ctx.fillStyle= model.palette[0].colour;
   ctx.fillRect(0,0,this.outputImage.width,this.outputImage.height)
@@ -84,8 +90,6 @@ IsometricRender.prototype.updateRender = function() {
     for (var k=0; k<model.depth; k++) {
       for (var j=0; j<model.height; j++) {
 
-
-
         nx =  xxcomp<0 ? model.width - (1+i) : i*xxcomp;
         nx += xzcomp<0 ? model.depth - (1+k) : k*xzcomp;
         nz =  zxcomp<0 ? model.width - (1+i) : i*zxcomp;
@@ -96,11 +100,12 @@ IsometricRender.prototype.updateRender = function() {
         if (material !== "gas") {
           if (model.visible[nx][j][nz] || j == this.cutoff) {
             if (material == "liquid") ctx.globalAlpha=0.3;
-            var tx = id*8;
+
+            var tx = id*size;
             var ty = 0;
-            var x = model.depth*4 + i*4 -k*4;
-            var y = model.height*3 + i*2 + k*2 - j*3;
-            ctx.drawImage(this.tileSheet,tx,ty,8,8, x,y,8,8);
+            var x = model.depth*half + i*half -k*half;
+            var y = model.height*half + i*quarter + k*quarter - j*half;
+            ctx.drawImage(this.tileSheet,tx,ty,size,size, x,y,size,size);
             if (material == "liquid") ctx.globalAlpha=1;
           }
         }
