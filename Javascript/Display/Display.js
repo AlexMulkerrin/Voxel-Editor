@@ -43,13 +43,15 @@ Display.prototype.updateRender = function() {
 Display.prototype.refresh = function() {
   this.clearCanvas();
   this.drawSlice();
-  this.drawIsometricRender();
+  //this.drawIsometricRender();
   this.drawInterface();
   this.drawButtons();
 
   this.drawSideBar();
   this.drawColourPicker();
   this.drawInfo();
+
+this.drawIsometricRender();
 
   this.drawTooltips();
   this.drawCursor();
@@ -96,7 +98,10 @@ Display.prototype.drawIsometricRender = function() {
 	this.drawRectangle(this.canvas.width-215, 48, 215, 132, this.targetSchematic.palette[0].colour);
   var tx = (215 - this.render.outputImage.width)/2;
   var ty = (178 - this.render.outputImage.height);
-  this.ctx.drawImage(this.render.outputImage, (this.canvas.width-215)+tx, ty);
+  // debug positioning
+  this.ctx.drawImage(this.render.outputImage, 0, 50);
+
+  //this.ctx.drawImage(this.render.outputImage, (this.canvas.width-215)+tx, ty);
 
   //this.ctx.fillStyle = "#9FAEC2";
   //this.ctx.fillRect(tx-17, 48, 1, this.render.outputImage.height);
