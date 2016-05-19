@@ -7,22 +7,19 @@ function IsometricRender(schematic) {
 
   this.outputImage = document.createElement('canvas');
   this.tileSheet = document.createElement('canvas');
-  this.tileSize = 30;
+  this.tempCanvas = document.createElement('canvas');
+  this.tileSize = 50;
 
 	this.blockImage = [];
 	this.loadBlockImages();
-  /*this.blockImage = new Image();
-  this.blockImage.crossOrigin = "Anonymous";
-  this.blockImage.src = "Resources/Images/GiantWoolTexture.png";
-  var t = this;
-  this.blockImage.onload = function() {
-	  t.tileSize = 50;//t.blockImage.width;
-	  t.createRender();
-  }*/
 }
 
 IsometricRender.prototype.loadBlockImages = function() {
-	var textureNames = ["brick","cobblestone","dirt","glass","grass","leaves","log","planks","sand","stone","water","wool"];
+	var textureNames = ["bookshelf","explosives","brick","cobblestone","dirt",
+	"red flower","yellow flower","glass","gold ore","gold","grass","gravel",
+	"half block","iron ore","iron","lava","leaves","log","mossy cobblestone",
+	"obsidian","planks","sand","sponge","stone","water","wool","coal","bedrock",
+	"brown mushroom","red mushroom","two half blocks","sapling"];
 	this.totalImages = textureNames.length;
 	this.loadedImages = 0;
 	var t = this;
@@ -49,6 +46,15 @@ IsometricRender.prototype.createRender = function () {
   this.updateRender();
 }
 
+IsometricRender.prototype.resizeTileSize = function (width, height) {
+	var model = this.targetSchematic
+	maxXSize = (2*width)/(model.width+model.depth+2);
+	maxYSize = (4*height)/(model.width+model.depth+2*model.height+4);
+	this.tileSize = Math.floor(Math.min(maxXSize,maxYSize));
+
+	this.createRender();
+}
+
 // creates a tilesheet with default block image adjusted to match each
 // colouration present in schematic palette.
 IsometricRender.prototype.createTileSheet = function (sourceImage) {
@@ -56,13 +62,24 @@ IsometricRender.prototype.createTileSheet = function (sourceImage) {
   this.tileSheet.width = palette.length*this.tileSize;
   this.tileSheet.height = this.tileSize;
   var ctx = this.tileSheet.getContext("2d");
+  this.tempCanvas.width = this.tileSize;
+  this.tempCanvas.height = this.tileSize;
+  var tempCtx = this.tempCanvas.getContext("2d");
+
+  //clear temp canvas to be used after each tile is drawn
+  var clearRect = tempCtx.createImageData(this.tileSize, this.tileSize);
+  for (var i=0; i<clearRect.data.length; i++) {
+	clearRect.data[i] = 0;
+  }
 
 
   for (var i=0; i<palette.length; i++) {
-	  var textureIndex = textureID[palette[i].texture] || 0;
+	  var textureIndex = textureID[palette[i].texture];
 
-	  ctx.drawImage(this.blockImage[textureIndex], 0, 0, this.tileSize, this.tileSize);
-	  var imageData = ctx.getImageData(0, 0, this.tileSize, this.tileSize);
+	  tempCtx.drawImage(this.blockImage[textureIndex], 0, 0, this.tileSize, this.tileSize);
+	  var imageData = tempCtx.getImageData(0, 0, this.tileSize, this.tileSize);
+	  // wipe initial tile for next
+  		tempCtx.putImageData(clearRect,0,0);
 	  var data = imageData.data;
 
 	  var blockColour = colourComponents("#ffffff");
@@ -125,10 +142,10 @@ IsometricRender.prototype.updateRender = function() {
         nz += zzcomp<0 ? model.depth - (1+k) : k*zzcomp;
 
         var id = model.block[nx][j][nz];
-        var material = model.palette[id].model || model.palette[id].material ; //ugly kludge for old file type
-        if ( !(material == "none" || material == "air") ) {
+        var material = model.palette[id].model;
+        if ( !(material == "none") ) {
           if (model.visible[nx][j][nz] || j == this.cutoff) {
-            if (material == "transparent") ctx.globalAlpha=0.3;
+            if (material == "transparent") ctx.globalAlpha=0.7;
 
             var tx = id*size;
             var ty = 0;
