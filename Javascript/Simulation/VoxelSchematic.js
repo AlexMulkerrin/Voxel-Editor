@@ -181,6 +181,25 @@ VoxelSchematic.prototype.readJSON = function(JSONtext) {
 	this.depth = JSONtext.depth;
 
 	this.palette = JSONtext.palette;
+	// check for old palette
+	if (this.palette[0].texture === undefined) {
+		console.log("old!");
+		for (var i=0; i<this.palette.length; i++) {
+			if (this.palette[i].material === "gas") {
+				this.palette[i].model = "none";
+				this.palette[i].texture = "stone";
+
+			} else if (this.palette[i].material === "solid") {
+				this.palette[i].model = "solid";
+				this.palette[i].texture = "wool";
+
+			} else if (this.palette[i].material === "liquid") {
+				this.palette[i].model = "transparent";
+				this.palette[i].texture = "water";
+			}
+			this.palette[i].customColour = true;
+		}
+	}
 	this.block = this.readRunLengthEncoding(JSONtext["RunLengthEncoded blocks"]);
 
 	this.visible = create3DArray(this.width, this.height, this.depth, false);
@@ -276,7 +295,7 @@ VoxelSchematic.prototype.isAdjacentToGas = function(x,y,z) {
 VoxelSchematic.prototype.isGas = function(x,y,z) {
   var id = this.block[x][y][z];
   var material = this.palette[id].model;
-  if (material == "none" || material == "air" ) {
+  if (material == "none") {
     return true;
   } else {
     return false;

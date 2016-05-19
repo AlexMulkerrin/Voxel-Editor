@@ -63,6 +63,7 @@ Program.prototype.handleLoadedText = function(loadedText) {
 		this.schematic.readJSON(resultJSON);
 		this.control.view.sliceHeight = 0;
 		this.control.currentPalette = 2;
+		this.display.resizeCanvas();
 		this.display.updatePalette();
 		this.control.createButtons();
 }
