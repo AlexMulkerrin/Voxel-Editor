@@ -59,7 +59,7 @@ IsometricRender.prototype.createTileSheet = function (sourceImage) {
 
 
   for (var i=0; i<palette.length; i++) {
-	  var textureIndex = textureID[palette[i].texture];
+	  var textureIndex = textureID[palette[i].texture] || 0;
 
 	  ctx.drawImage(this.blockImage[textureIndex], 0, 0, this.tileSize, this.tileSize);
 	  var imageData = ctx.getImageData(0, 0, this.tileSize, this.tileSize);
@@ -125,8 +125,8 @@ IsometricRender.prototype.updateRender = function() {
         nz += zzcomp<0 ? model.depth - (1+k) : k*zzcomp;
 
         var id = model.block[nx][j][nz];
-        var material = model.palette[id].model;
-        if (material !== "none") {
+        var material = model.palette[id].model || model.palette[id].material ; //ugly kludge for old file type
+        if ( !(material == "none" || material == "air") ) {
           if (model.visible[nx][j][nz] || j == this.cutoff) {
             if (material == "transparent") ctx.globalAlpha=0.3;
 
