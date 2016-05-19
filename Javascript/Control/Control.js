@@ -1,3 +1,5 @@
+const viewTabID = {slice:0, isometric:1, render3D:2, text:3};
+
 function Control(canvasName, schematic, program) {
 	this.targetProgram = program;
 	this.targetCanvas = document.getElementById(canvasName);
@@ -12,6 +14,8 @@ function Control(canvasName, schematic, program) {
 
 	this.currentPalette = 2;
 	this.currentColour = colourComponents(this.targetSchematic.palette[this.currentPalette].colour);
+
+	this.currentTabView = viewTabID.isometric;
 
 	this.createButtons();
 	this.createKeyboardEventHandlers();
@@ -260,6 +264,12 @@ Control.prototype.createButtons = function () {
     this.button.push( new Button(50, 24, 22, 22, 2, "O", "saveAsJSON") );
 	this.button.push( new Button(74, 24, 22, 22, 5, "P", "saveAsImage") );
 
+	// viewport options
+	this.button.push( new Button(155, 24, 36, 22, null, "", "toggleMainView", viewTabID.slice) );
+	this.button.push( new Button(195, 24, 56, 22, null, "", "toggleMainView", viewTabID.isometric) );
+	this.button.push( new Button(255, 24, 55, 22, null, "", "toggleMainView", viewTabID.render3D) );
+	this.button.push( new Button(315, 24, 42, 22, null, "", "toggleMainView", viewTabID.text) );
+
     // palette
 	var palette = this.targetSchematic.palette;
 	var px = this.targetCanvas.width-203;
@@ -276,13 +286,6 @@ Control.prototype.createButtons = function () {
 	// edit palette buttons
 	this.button.push(  new Button(px+x*24, py+y*24, 22, 22, 14, "", "extendPalette") );
 	this.button.push(  new Button(c.width-33, 186, 22, 22, 8, "", "removePalette") );
-
-
-	// viewport options
-	this.button.push( new Button(155, 24, 36, 22, null, "", "noEffect") );
-    this.button.push( new Button(195, 24, 56, 22, null, "", "noEffect") );
-    this.button.push( new Button(255, 24, 55, 22, null, "", "noEffect") );
-	this.button.push( new Button(315, 24, 42, 22, null, "", "noEffect") );
 
 	// rotation buttons
 	this.button.push( new Button(c.width-214, 156, 22, 22, 9, "", "rotateRender", -1) );
@@ -322,7 +325,8 @@ Control.prototype.createButtons = function () {
 
     // file tab button
   //  this.button[27] = new Button(1, 1, 30, 19, null, "fileMenu");
-  this.button[this.currentPalette+4].isSelected = true;
+  this.button[5].isSelected = true;
+  this.button[this.currentPalette+8].isSelected = true;
   this.mouse.selected = this.currentPalette+4;
 }
 function Button(x, y, width, height, icon, hotkey, func, funcArgs) {
@@ -361,6 +365,12 @@ Control.prototype.saveAsImage = function() {
     this.targetProgram.saveImage();
 }
 
+Control.prototype.toggleMainView = function(newView) {
+	this.button[this.currentTabView+4].isSelected = false;
+	this.button[newView+4].isSelected = true;
+	this.currentTabView = newView;
+}
+
 // rotate isometric render
 Control.prototype.rotateRender = function(direc) {
 	var rotation = this.targetDisplay.render.rotation;
@@ -375,7 +385,7 @@ Control.prototype.rotateRender = function(direc) {
 Control.prototype.selectPalette = function(id) {
 	this.currentPalette = id;
 	this.button[this.mouse.selected].isSelected = false;
-    this.mouse.selected = id + 4;
+    this.mouse.selected = id + 8;
     this.button[this.mouse.selected].isSelected = true;
 	this.currentColour = colourComponents(this.targetSchematic.palette[id].colour);
 }
@@ -493,6 +503,10 @@ Control.prototype.fitToWindow = function() {
 
     var maxWorkspaceWidth = this.targetCanvas.width - (this.view.borderLeft + this.view.borderRight);
     var maxWorkspaceHeight = this.targetCanvas.height - (this.view.borderTop + this.view.borderBottom);
+
+	if (this.currentTabView === viewTabID.isometric) {
+		this.targetDisplay.render.resizeTileSize(maxWorkspaceWidth,maxWorkspaceHeight);//maxWorkspaceWidth, maxWorkspaceHeight);
+	}
 
     while (this.view.pixelPerCell > maxWorkspaceWidth / model.width && this.view.pixelPerCell > 1) {
         this.view.pixelPerCell = this.view.pixelPerCell / 2;
