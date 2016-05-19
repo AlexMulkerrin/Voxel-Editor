@@ -6,6 +6,9 @@ function Display(canvasName, schematic, control) {
   this.ctx = this.canvas.getContext("2d");
   this.render = new IsometricRender(schematic);
 
+	this.maxViewWidth;
+	this.maxViewHeight;
+
 	this.icon = [];
 	this.loadIcons();
 
@@ -29,6 +32,14 @@ Display.prototype.loadIcons = function () {
 Display.prototype.resizeCanvas = function () {
 	this.canvas.width = window.innerWidth;
 	this.canvas.height = window.innerHeight;
+
+	this.maxViewWidth = this.canvas.width - (this.targetControl.view.borderLeft + this.targetControl.view.borderRight);
+    this.maxViewHeight = this.canvas.height - (this.targetControl.view.borderTop + this.targetControl.view.borderBottom);
+
+	if (this.targetControl.currentTabView === viewTabID.isometric) {
+		this.render.resizeTileSize(this.maxViewWidth, this.maxViewHeight);
+	}
+
 	this.targetControl.repositionButtons();
 	this.refresh();
 }
@@ -51,7 +62,9 @@ Display.prototype.refresh = function() {
   this.drawColourPicker();
   this.drawInfo();
 
-this.drawIsometricRender();
+	if (this.targetControl.currentTabView === viewTabID.isometric) {
+		this.drawIsometricRender();
+	}
 
   this.drawTooltips();
   this.drawCursor();
@@ -95,11 +108,10 @@ Display.prototype.drawSlice = function() {
 }
 
 Display.prototype.drawIsometricRender = function() {
-	this.drawRectangle(this.canvas.width-215, 48, 215, 132, this.targetSchematic.palette[0].colour);
-  var tx = (215 - this.render.outputImage.width)/2;
-  var ty = (178 - this.render.outputImage.height);
-  // debug positioning
-  this.ctx.drawImage(this.render.outputImage, 0, 50);
+	this.drawRectangle(this.targetControl.view.borderLeft, this.targetControl.view.borderTop, this.maxViewWidth, this.maxViewHeight, this.targetSchematic.palette[0].colour);
+  	var tx = this.targetControl.view.borderLeft + (this.maxViewWidth - this.render.outputImage.width)/2;
+  	var ty = this.targetControl.view.borderTop + (this.maxViewHeight - this.render.outputImage.height)/2;
+  	this.ctx.drawImage(this.render.outputImage, tx, ty);
 
   //this.ctx.drawImage(this.render.outputImage, (this.canvas.width-215)+tx, ty);
 
@@ -236,6 +248,7 @@ Display.prototype.drawInfo = function () {
     this.ctx.fillStyle = "#000033";
     this.ctx.fillText("Edit", 5, 13);
     this.ctx.fillText("*"+this.targetSchematic.fileName+" - Voxel Editor v0.3", 45, 13);
+	this.ctx.fillText("Current View: "+this.targetControl.currentTabView, 345, 13);
 
 	this.ctx.fillText("View: ", 120, 38);
 	this.ctx.fillText("Slice", 160, 38);
