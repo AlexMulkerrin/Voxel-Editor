@@ -276,7 +276,7 @@ VoxelSchematic.prototype.isAdjacentToGas = function(x,y,z) {
 VoxelSchematic.prototype.isGas = function(x,y,z) {
   var id = this.block[x][y][z];
   var material = this.palette[id].model;
-  if (material == "none") {
+  if (material == "none" || material == "air" ) {
     return true;
   } else {
     return false;
