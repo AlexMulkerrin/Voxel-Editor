@@ -7,16 +7,39 @@ function IsometricRender(schematic) {
 
   this.outputImage = document.createElement('canvas');
   this.tileSheet = document.createElement('canvas');
-  this.tileSize = 0;
+  this.tileSize = 30;
 
-  this.blockImage = new Image();
+	this.blockImage = [];
+	this.loadBlockImages();
+  /*this.blockImage = new Image();
   this.blockImage.crossOrigin = "Anonymous";
   this.blockImage.src = "Resources/Images/GiantWoolTexture.png";
   var t = this;
   this.blockImage.onload = function() {
 	  t.tileSize = 50;//t.blockImage.width;
 	  t.createRender();
-  }
+  }*/
+}
+
+IsometricRender.prototype.loadBlockImages = function() {
+	var textureNames = ["brick","cobblestone","dirt","glass","grass","leaves","log","planks","sand","stone","water","wool"];
+	this.totalImages = textureNames.length;
+	this.loadedImages = 0;
+	var t = this;
+	for (var i=0; i<textureNames.length; i++) {
+		var name = textureNames[i];
+		this.blockImage[i] = new Image();
+		this.blockImage[i].crossOrigin = "Anonymous";
+	    this.blockImage[i].src = "Resources/Images/Isometric Blocks/"+name+".png";
+		var t = this;
+		this.blockImage[i].onload = function() {
+			t.loadedImages++;
+			if (t.loadedImages === t.totalImages) {
+				// t.tileSize = 50;//t.blockImage.width;
+		 		t.createRender();
+	 		}
+		}
+	}
 }
 
 // create render method called when block image is loaded or when schematic
@@ -34,12 +57,18 @@ IsometricRender.prototype.createTileSheet = function (sourceImage) {
   this.tileSheet.height = this.tileSize;
   var ctx = this.tileSheet.getContext("2d");
 
-  ctx.drawImage(this.blockImage, 0, 0, this.tileSize, this.tileSize);
-  var imageData = ctx.getImageData(0, 0, this.tileSize, this.tileSize);
-  var data = imageData.data;
 
   for (var i=0; i<palette.length; i++) {
-    var blockColour = colourComponents(palette[i].colour);
+	  var textureIndex = textureID[palette[i].texture];
+
+	  ctx.drawImage(this.blockImage[textureIndex], 0, 0, this.tileSize, this.tileSize);
+	  var imageData = ctx.getImageData(0, 0, this.tileSize, this.tileSize);
+	  var data = imageData.data;
+
+	  var blockColour = colourComponents("#ffffff");
+	  if (palette[i].customColour) {
+    	blockColour = colourComponents(palette[i].colour);
+	}
 
     var oldData = [];
     for (var j=0; j<data.length; j++) {
@@ -96,17 +125,17 @@ IsometricRender.prototype.updateRender = function() {
         nz += zzcomp<0 ? model.depth - (1+k) : k*zzcomp;
 
         var id = model.block[nx][j][nz];
-        var material = model.palette[id].material;
-        if (material !== "gas") {
+        var material = model.palette[id].model;
+        if (material !== "none") {
           if (model.visible[nx][j][nz] || j == this.cutoff) {
-            if (material == "liquid") ctx.globalAlpha=0.3;
+            if (material == "transparent") ctx.globalAlpha=0.3;
 
             var tx = id*size;
             var ty = 0;
             var x = model.depth*half + i*half -k*half;
             var y = model.height*half + i*quarter + k*quarter - j*half;
             ctx.drawImage(this.tileSheet,tx,ty,size,size, x,y,size,size);
-            if (material == "liquid") ctx.globalAlpha=1;
+            if (material == "transparent") ctx.globalAlpha=1;
           }
         }
       }

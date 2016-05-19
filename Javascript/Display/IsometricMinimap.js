@@ -92,16 +92,16 @@ IsometricRender.prototype.updateRender = function() {
         nz += zzcomp<0 ? model.depth - (1+k) : k*zzcomp;
 
         var id = model.block[nx][j][nz];
-        var material = model.palette[id].material;
-        if (material !== "gas") {
+        var material = model.palette[id].model;
+        if (material !== "none") {
           if (model.visible[nx][j][nz] || j == this.cutoff) {
-            if (material == "liquid") ctx.globalAlpha=0.3;
+            if (material == "transparent") ctx.globalAlpha=0.3;
             var tx = id*8;
             var ty = 0;
             var x = model.depth*4 + i*4 -k*4;
             var y = model.height*3 + i*2 + k*2 - j*3;
             ctx.drawImage(this.tileSheet,tx,ty,8,8, x,y,8,8);
-            if (material == "liquid") ctx.globalAlpha=1;
+            if (material == "transparent") ctx.globalAlpha=1;
           }
         }
       }

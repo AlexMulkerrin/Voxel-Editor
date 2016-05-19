@@ -6,7 +6,7 @@ function loadProgram() {
 
 function Program(canvasName) {
 	this.updateDelay = 50;
-	this.schematic = new VoxelSchematic(16,16,16);
+	this.schematic = new VoxelSchematic(3,3,3);
 	//this.schematic.randomise();
 	var t = this;
 	this.control = new Control(canvasName, this.schematic, t);
@@ -65,7 +65,7 @@ Program.prototype.handleLoadedText = function(loadedText) {
 		this.control.currentPalette = 2;
 		this.display.updatePalette();
 		this.control.createButtons();
-}	
+}
 
 Program.prototype.saveJSON = function() {
 	var text = this.schematic.createJSON();

@@ -165,6 +165,9 @@ VoxelSchematic.prototype.generatePaletteJSON = function() {
 		result +='"name":"'+blockType.name+'",';
 		result +='"symbol":"'+symbolList[i]+'",';
 		result +='"material":"'+blockType.material+'",';
+		result +='"model":"'+blockType.model+'",';
+		result +='"texture":"'+blockType.texture+'",';
+		if (blockType.customColour) result +='"customColour":"'+blockType.customColour+'",';
 		result +='"colour":"'+blockType.colour+'"';
 		result +='}';
 	}
@@ -272,8 +275,8 @@ VoxelSchematic.prototype.isAdjacentToGas = function(x,y,z) {
 }
 VoxelSchematic.prototype.isGas = function(x,y,z) {
   var id = this.block[x][y][z];
-  var material = this.palette[id].material;
-  if (material == "gas") {
+  var material = this.palette[id].model;
+  if (material == "none") {
     return true;
   } else {
     return false;
@@ -290,6 +293,6 @@ VoxelSchematic.prototype.isAdjacentToTransparent = function(x,y,z) {
 }
 VoxelSchematic.prototype.isTransparent = function(x,y,z) {
   var id=this.block[x][y][z];
-  var material = this.palette[id].material;
+  var material = this.palette[id].model;
   return materialTransparent[materialID[material]];
 }
