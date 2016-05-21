@@ -18,11 +18,13 @@ function Display(canvasName, schematic, control) {
 }
 
 Display.prototype.loadIcons = function () {
-    var iconName = [   "new", "load", "save", "increase", "decrease", "camera", "splitter",
-						"rotate", "remove", "undo", "redo", "run", "pause", "fullscreen",
-						"windowed", "scrollUp", "scrollDown", "scrollLeft", "scrollRight",
-						"resize", "position", "fitToWindow", "zoomIn", "zoomOut",
-                        "wirehead", "wireInLeft", "wireInRight", "wireInBack", "wireInverter"];
+	var iconName = [
+			"new", "load", "save", "increase", "decrease", 
+			"camera", "rotate", "remove", "undo", "redo",
+			"fullscreen", "windowed", "scrollUp", "scrollDown", "scrollLeft",
+			"scrollRight", "resize", "position", "fitToWindow", "zoomIn",
+			"zoomOut"
+	];
     for (var i = 0; i < iconName.length; i++) {
         this.icon[i] = new Image();
         this.icon[i].src = "Resources/Icons/" + iconName[i] + ".svg";
@@ -190,6 +192,10 @@ Display.prototype.drawSideBar = function() {
 	for (var i=0; i<palette.length; i++) {
 		this.ctx.fillStyle = palette[i].colour;
 		this.ctx.fillRect(px+x*24, py+y*24, 16, 16);
+
+		//have little blocks to click?
+		//this.ctx.drawImage(this.render.getIcon(i,), px+x*24, py+y*24);
+		//this.ctx.drawImage(this.)
 		x++;
 		if (x>7) {
 			x=0;

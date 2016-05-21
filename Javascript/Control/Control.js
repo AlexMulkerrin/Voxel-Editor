@@ -15,7 +15,7 @@ function Control(canvasName, schematic, program) {
 	this.currentPalette = 2;
 	this.currentColour = colourComponents(this.targetSchematic.palette[this.currentPalette].colour);
 
-	this.currentTabView = viewTabID.isometric;
+	this.currentTabView = viewTabID.slice;
 
 	this.createButtons();
 	this.createKeyboardEventHandlers();
@@ -284,12 +284,12 @@ Control.prototype.createButtons = function () {
 		}
 	}
 	// edit palette buttons
-	this.button.push(  new Button(px+x*24, py+y*24, 22, 22, 14, "", "extendPalette") );
-	this.button.push(  new Button(c.width-33, 186, 22, 22, 8, "", "removePalette") );
+	this.button.push(  new Button(px+x*24, py+y*24, 22, 22, 11, "", "extendPalette") );
+	this.button.push(  new Button(c.width-33, 186, 22, 22, 7, "", "removePalette") );
 
 	// rotation buttons
-	this.button.push( new Button(c.width-214, 156, 22, 22, 9, "", "rotateRender", -1) );
-    this.button.push( new Button(c.width-23, 156, 22, 22, 10, "", "rotateRender", 1) );
+	this.button.push( new Button(c.width-214, 156, 22, 22, 8, "", "rotateRender", -1) );
+    this.button.push( new Button(c.width-23, 156, 22, 22, 9, "", "rotateRender", 1) );
 
 	// colour sliders
 	this.button.push(  new Button(px+20, 270, 160, 22, null, "", "changeColour", 0) );
@@ -297,12 +297,12 @@ Control.prototype.createButtons = function () {
 	this.button.push(  new Button(px+20, 330, 160, 22, null, "", "changeColour", 2) );
 
     // viewport controls
-    this.button.push(  new Button(c.width - 21, 1, 20, 20, 13, "F", "fullscreen") );
+    this.button.push(  new Button(c.width - 21, 1, 20, 20, 10, "F", "fullscreen") );
 
-    this.button.push(  new Button(c.width - this.view.borderRight, 48, 16, 16, 15, "W", "scrollUp") );
-    this.button.push(  new Button(c.width - this.view.borderRight, c.height - 58, 16, 16, 16, "S", "scrollDown") );
-    this.button.push(  new Button(0, c.height - 42, 16, 16, 17, "A", "scrollLeft") );
-    this.button.push(  new Button(c.width - (16+this.view.borderRight), c.height - 42, 16, 16, 18, "D", "scrollRight") );
+    this.button.push(  new Button(c.width - this.view.borderRight, 48, 16, 16, 12, "W", "scrollUp") );
+    this.button.push(  new Button(c.width - this.view.borderRight, c.height - 58, 16, 16, 13, "S", "scrollDown") );
+    this.button.push(  new Button(0, c.height - 42, 16, 16, 14, "A", "scrollLeft") );
+    this.button.push(  new Button(c.width - (16+this.view.borderRight), c.height - 42, 16, 16, 15, "D", "scrollRight") );
 
     // size and scale
     //this.button.push(  new Button(3, c.height - 23, 20, 20, 19, "resize") );
@@ -312,10 +312,10 @@ Control.prototype.createButtons = function () {
 	this.button.push(  new Button(440, c.height - 23, 20, 9, 3, "E", "shiftViewUp") );
 	this.button.push(  new Button(440, c.height - 12, 20, 9, 4, "Q", "shiftViewDown") );
 
-    this.button.push(  new Button(152, c.height - 23, 20, 20, 20, "", "noEffect") );
-    this.button.push(  new Button(c.width - 70, c.height - 23, 20, 20, 21, "J", "fitToWindow") );
-    this.button.push(  new Button(c.width - 46, c.height - 23, 20, 20, 22, "K", "zoomIn") );
-    this.button.push(  new Button(c.width - 22, c.height - 23, 20, 20, 23, "L", "zoomOut") );
+    this.button.push(  new Button(152, c.height - 23, 20, 20, 17, "", "noEffect") );
+    this.button.push(  new Button(c.width - 70, c.height - 23, 20, 20, 18, "J", "fitToWindow") );
+    this.button.push(  new Button(c.width - 46, c.height - 23, 20, 20, 19, "K", "zoomIn") );
+    this.button.push(  new Button(c.width - 22, c.height - 23, 20, 20, 20, "L", "zoomOut") );
 
     // scrollbar sections
     this.button.push( new Button(c.width - this.view.borderRight, 64, 16, 16, null, "W", "scrollUp") );
