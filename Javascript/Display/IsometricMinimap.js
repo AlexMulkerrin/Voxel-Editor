@@ -1,6 +1,6 @@
 // Isometric Renderer creates an HTML5 canvas with render output upon it which can be
 // given to Display object to draw.
-function IsometricRender(schematic) {
+function IsometricMinimap(schematic) {
   this.targetSchematic = schematic;
   this.rotation = 0;
   this.cutoff = this.targetSchematic.height;
@@ -19,14 +19,14 @@ function IsometricRender(schematic) {
 
 // create render method called when block image is loaded or when schematic
 // palette is updated and tilesheet needs to be re-populated.
-IsometricRender.prototype.createRender = function () {
+IsometricMinimap.prototype.createRender = function () {
   this.createTileSheet();
   this.updateRender();
 }
 
 // creates a tilesheet with default block image adjusted to match each
 // colouration present in schematic palette.
-IsometricRender.prototype.createTileSheet = function (sourceImage) {
+IsometricMinimap.prototype.createTileSheet = function (sourceImage) {
   var palette = this.targetSchematic.palette;
   this.tileSheet.width = palette.length*8;
   this.tileSheet.height = 8;
@@ -64,7 +64,7 @@ IsometricRender.prototype.createTileSheet = function (sourceImage) {
 }
 
 // redraws isometric render, to be called when contents of schematic block array changes.
-IsometricRender.prototype.updateRender = function() {
+IsometricMinimap.prototype.updateRender = function() {
   var rotationTransforms = [ [[1,0],[0,1]], [[0,-1],[1,0]], [[-1,0],[0,-1]], [[0,1],[-1,0]] ];
 
   var model = this.targetSchematic;
@@ -83,8 +83,6 @@ IsometricRender.prototype.updateRender = function() {
   for (var i=0; i<model.width; i++) {
     for (var k=0; k<model.depth; k++) {
       for (var j=0; j<model.height; j++) {
-
-
 
         nx =  xxcomp<0 ? model.width - (1+i) : i*xxcomp;
         nx += xzcomp<0 ? model.depth - (1+k) : k*xzcomp;

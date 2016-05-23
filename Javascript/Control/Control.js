@@ -238,13 +238,13 @@ Control.prototype.mouseWheel = function (event) {
 }
 
 function View() {
-    this.offsetX = 5;
-    this.offsetY = 53;
+    this.offsetX = 0;
+    this.offsetY = 48;
     this.x = this.offsetX;
     this.y = this.offsetY;
 
-    this.borderTop = 53;
-    this.borderLeft = 5;
+    this.borderTop = 48;
+    this.borderLeft = 0;
     this.borderRight = 232;
     this.borderBottom = 48;
 
@@ -273,7 +273,7 @@ Control.prototype.createButtons = function () {
     // palette
 	var palette = this.targetSchematic.palette;
 	var px = this.targetCanvas.width-203;
-	var py = 397;
+	var py = 497;
 	var x=0, y=0;
 	for (var i=0; i<palette.length; i++) {
 		this.button.push(  new Button(px+x*24, py+y*24, 22, 22, null, i+1, "selectPalette", i) );
@@ -285,16 +285,16 @@ Control.prototype.createButtons = function () {
 	}
 	// edit palette buttons
 	this.button.push(  new Button(px+x*24, py+y*24, 22, 22, 11, "", "extendPalette") );
-	this.button.push(  new Button(c.width-33, 186, 22, 22, 7, "", "removePalette") );
+	this.button.push(  new Button(c.width-33, 286, 22, 22, 7, "", "removePalette") );
 
 	// rotation buttons
-	this.button.push( new Button(c.width-214, 156, 22, 22, 8, "", "rotateRender", -1) );
-    this.button.push( new Button(c.width-23, 156, 22, 22, 9, "", "rotateRender", 1) );
+	this.button.push( new Button(c.width-214, 240, 22, 22, 8, "", "rotateRender", -1) );
+    this.button.push( new Button(c.width-23, 240, 22, 22, 9, "", "rotateRender", 1) );
 
 	// colour sliders
-	this.button.push(  new Button(px+20, 270, 160, 22, null, "", "changeColour", 0) );
-	this.button.push(  new Button(px+20, 300, 160, 22, null, "", "changeColour", 1) );
-	this.button.push(  new Button(px+20, 330, 160, 22, null, "", "changeColour", 2) );
+	this.button.push(  new Button(px+20, 370, 160, 22, null, "", "changeColour", 0) );
+	this.button.push(  new Button(px+20, 400, 160, 22, null, "", "changeColour", 1) );
+	this.button.push(  new Button(px+20, 430, 160, 22, null, "", "changeColour", 2) );
 
     // viewport controls
     this.button.push(  new Button(c.width - 21, 1, 20, 20, 10, "F", "fullscreen") );
@@ -325,7 +325,7 @@ Control.prototype.createButtons = function () {
 
     // file tab button
   //  this.button[27] = new Button(1, 1, 30, 19, null, "fileMenu");
-  this.button[5].isSelected = true;
+  this.button[4].isSelected = true;
   this.button[this.currentPalette+8].isSelected = true;
   this.mouse.selected = this.currentPalette+4;
 }
@@ -369,6 +369,7 @@ Control.prototype.toggleMainView = function(newView) {
 	this.button[this.currentTabView+4].isSelected = false;
 	this.button[newView+4].isSelected = true;
 	this.currentTabView = newView;
+	this.fitToWindow();
 }
 
 // rotate isometric render
@@ -467,6 +468,7 @@ Control.prototype.scrollRight = function() {
 Control.prototype.increaseSize = function() {
 	this.targetSchematic.increaseSize();
 	this.fitToWindow();
+	this.targetDisplay.minimap.resizeTileSize(200,200);
 	this.targetDisplay.updateRender();
 }
 Control.prototype.decreaseSize = function() {
@@ -475,6 +477,7 @@ Control.prototype.decreaseSize = function() {
 		this.view.sliceHeight = this.targetSchematic.height -1;
 	}
 	this.fitToWindow();
+	this.targetDisplay.minimap.resizeTileSize(200,200);
 	this.targetDisplay.updateRender();
 }
 Control.prototype.noEffect = function() {

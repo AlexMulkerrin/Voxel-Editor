@@ -1,10 +1,13 @@
 function Display(canvasName, schematic, control) {
-  this.targetSchematic = schematic;
-  this.targetControl = control;
+	this.targetSchematic = schematic;
+	this.targetControl = control;
 
-  this.canvas = document.getElementById(canvasName);
-  this.ctx = this.canvas.getContext("2d");
-  this.render = new IsometricRender(schematic);
+	this.canvas = document.getElementById(canvasName);
+	this.ctx = this.canvas.getContext("2d");
+
+	this.render = new IsometricRender(schematic);
+	this.minimap = new IsometricRender(schematic);
+	this.imageLoader = new ImageLoader(this);
 
 	this.maxViewWidth;
 	this.maxViewHeight;
@@ -12,14 +15,25 @@ function Display(canvasName, schematic, control) {
 	this.icon = [];
 	this.loadIcons();
 
-  var t = this;
-  window.onresize = function (){ t.resizeCanvas();};
-  this.resizeCanvas();
+	var t = this;
+	window.onresize = function (){ t.resizeCanvas();};
+	this.resizeCanvas();
+}
+
+Display.prototype.loadHandlerFunction = function() {
+	var images = this.imageLoader.blockImage;
+	this.render.setBlockImages(images);
+	this.render.createRender();
+
+	this.minimap.setBlockImages(images);
+	this.minimap.resizeTileSize(200,200);
+	this.minimap.createRender();
+	this.refresh();
 }
 
 Display.prototype.loadIcons = function () {
 	var iconName = [
-			"new", "load", "save", "increase", "decrease", 
+			"new", "load", "save", "increase", "decrease",
 			"camera", "rotate", "remove", "undo", "redo",
 			"fullscreen", "windowed", "scrollUp", "scrollDown", "scrollLeft",
 			"scrollRight", "resize", "position", "fitToWindow", "zoomIn",
@@ -47,16 +61,19 @@ Display.prototype.resizeCanvas = function () {
 }
 Display.prototype.updatePalette = function() {
 	this.render.createRender();
+	this.minimap.createRender();
 	this.refresh();
 }
 Display.prototype.updateRender = function() {
 	this.render.updateRender();
+	this.minimap.updateRender();
 	this.refresh();
 }
 Display.prototype.refresh = function() {
   this.clearCanvas();
   this.drawSlice();
-  //this.drawIsometricRender();
+  this.drawMinimap();
+
   this.drawInterface();
   this.drawButtons();
 
@@ -114,17 +131,16 @@ Display.prototype.drawIsometricRender = function() {
   	var tx = this.targetControl.view.borderLeft + (this.maxViewWidth - this.render.outputImage.width)/2;
   	var ty = this.targetControl.view.borderTop + (this.maxViewHeight - this.render.outputImage.height)/2;
   	this.ctx.drawImage(this.render.outputImage, tx, ty);
-
-  //this.ctx.drawImage(this.render.outputImage, (this.canvas.width-215)+tx, ty);
-
-  //this.ctx.fillStyle = "#9FAEC2";
-  //this.ctx.fillRect(tx-17, 48, 1, this.render.outputImage.height);
- // this.ctx.fillRect(tx-17, 48+this.render.outputImage.height, this.render.outputImage.width, 1);
-	this.drawRectangle(this.canvas.width-215, 179, 215, 1, "#9FAEC2");
-
 }
 
-Display.prototype.drawInterface = function () {
+Display.prototype.drawMinimap = function() {
+	this.drawRectangle(this.canvas.width-215, 48, 215, 215, this.targetSchematic.palette[0].colour);
+	var tx= (215 - this.minimap.outputImage.width)/2;
+	var ty= 48 + (215 - this.minimap.outputImage.height)/2;
+	this.ctx.drawImage(this.minimap.outputImage, (this.canvas.width-215)+tx, ty);
+}
+
+Display.prototype.drawInterface = function() {
     var c = this.canvas;
 	var view = this.targetControl.view;
     // top info bar
@@ -153,8 +169,11 @@ Display.prototype.drawInterface = function () {
     this.ctx.fillRect(132, c.height - 19, 1, 13);
 	this.ctx.fillRect(335, c.height - 19, 1, 13);
     this.ctx.fillRect(c.width - 122, c.height - 19, 1, 13);
+
 	// sidebar background
-	this.drawRectangle(this.canvas.width-215, 180, 215, this.canvas.height-206, "#FBFDFF");
+	this.drawRectangle(this.canvas.width-215, 263, 215, this.canvas.height-206, "#FBFDFF");
+	// bottom bar dividers
+	this.drawRectangle(this.canvas.width-215, 263, 215, 1, "#9FAEC2");
 
 }
 Display.prototype.drawButtons = function () {
@@ -187,7 +206,7 @@ Display.prototype.drawButton = function (button) {
 Display.prototype.drawSideBar = function() {
 	var palette = this.targetSchematic.palette;
 	var px = this.canvas.width-200;
-	var py = 400;
+	var py = 500;
 	var x=0, y=0;
 	for (var i=0; i<palette.length; i++) {
 		this.ctx.fillStyle = palette[i].colour;
@@ -206,13 +225,13 @@ Display.prototype.drawSideBar = function() {
 	var palette = this.targetSchematic.palette;
 
 	this.ctx.fillStyle = palette[current].colour;
-	this.ctx.fillRect(px+140, 188, 16, 16);
+	this.ctx.fillRect(px+140, 288, 16, 16);
 
 	this.ctx.fillStyle = "#000033";
-    this.ctx.fillText("Currently selected block: #"+current, px, 200);
-	this.ctx.fillText("name: "+palette[current].name, px, 220);
-	this.ctx.fillText("material: "+palette[current].material, px, 240);
-	this.ctx.fillText("colour code: "+palette[current].colour, px, 260);
+    this.ctx.fillText("Currently selected block: #"+current, px, 300);
+	this.ctx.fillText("name: "+palette[current].name, px, 320);
+	this.ctx.fillText("material: "+palette[current].material, px, 340);
+	this.ctx.fillText("colour code: "+palette[current].colour, px, 360);
 }
 
 Display.prototype.drawColourPicker = function() {
@@ -224,20 +243,20 @@ Display.prototype.drawColourPicker = function() {
 	for (var i=0; i<length; i++) {
 		var newRed = Math.floor(step*i);
 		this.ctx.fillStyle = toRGBString(newRed,colour[1],colour[2]);
-		this.ctx.fillRect(px+i, 270,1,21);
+		this.ctx.fillRect(px+i, 370,1,21);
 
 		var newGreen = Math.floor(step*i);
 		this.ctx.fillStyle = toRGBString(colour[0], newGreen, colour[2]);
-		this.ctx.fillRect(px+i,300,1,21);
+		this.ctx.fillRect(px+i,400,1,21);
 
 		var newBlue = Math.floor(step*i);
 		this.ctx.fillStyle = toRGBString(colour[0], colour[1], newBlue);
-		this.ctx.fillRect(px+i,330,1,21);
+		this.ctx.fillRect(px+i,430,1,21);
 	}
 	this.ctx.fillStyle = "#22BCFE";
-	this.ctx.fillRect(px+colour[0]/step, 269,2,22);
-	this.ctx.fillRect(px+colour[1]/step,299,2,22);
-	this.ctx.fillRect(px+colour[2]/step,329,2,22);
+	this.ctx.fillRect(px+colour[0]/step, 369,2,22);
+	this.ctx.fillRect(px+colour[1]/step,399,2,22);
+	this.ctx.fillRect(px+colour[2]/step,429,2,22);
 }
 
 Display.prototype.drawRectOnView = function(x,y,w,h) {
@@ -262,14 +281,14 @@ Display.prototype.drawInfo = function () {
     this.ctx.fillText("3D render", 260, 38);
 	this.ctx.fillText("Details", 320, 38);
 
-
+	// side bar info
 	var px = this.canvas.width-203;
-	this.ctx.fillText("R: ", px, 284);
-	this.ctx.fillText("G: ", px, 314);
-	this.ctx.fillText("B: ", px, 344);
-	this.ctx.fillText("Palette: ", px, 390);
+	this.ctx.fillText("R: ", px, 384);
+	this.ctx.fillText("G: ", px, 414);
+	this.ctx.fillText("B: ", px, 444);
+	this.ctx.fillText("Palette: ", px, 490);
 	this.ctx.fillStyle = "#9FAEC2";
-	this.ctx.fillRect( px, 368, this.canvas.width-(px+5), 1);
+	this.ctx.fillRect( px, 468, this.canvas.width-(px+5), 1);
 	this.ctx.fillStyle = "#000033";
 
     // bottom bar info
