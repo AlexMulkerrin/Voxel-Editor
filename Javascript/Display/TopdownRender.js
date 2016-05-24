@@ -14,7 +14,7 @@ function TopdownRender(schematic) {
 TopdownRender.prototype.loadImages = function() {
 	this.textureAtlas = new Image();
 	this.textureAtlas.crossOrigin = "Anonymous";
-	this.textureAtlas.src = "Resources/Images/textureAtlas.png";
+	this.textureAtlas.src = "Resources/Images/TextureAtlas.png";
 
 	var t = this;
 	this.textureAtlas.onload = function() {
