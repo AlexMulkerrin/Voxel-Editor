@@ -1,10 +1,10 @@
 const materialID = {none:0, transparent:1, solid:2, halfBlock:3, item:4, air:0, liquid:1};
 const materialTransparent = [true, true, false, true, true];
-const textureID = {bookshelf:0,explosives:1,brick:2,cobblestone:3,dirt:4,
-	"red flower":5,"yellow flower":6,glass:7,"gold ore":8,gold:9,grass:10,gravel:11,
-	"half block":12,"iron ore":13,iron:14,lava:15,leaves:16,log:17,"mossy cobblestone":18,
-	obsidian:19,planks:20,sand:21,sponge:22,stone:23,water:24,wool:25,coal:26,bedrock:27,
-	"brown mushroom":28,"red mushroom":29,"two half blocks":30,"sapling":31};
+const textureID = {stone:0, grass:1, dirt:2, cobblestone:3, planks:4, sapling:5, bedrock:6,
+	water:7, lava:8, sand:9, gravel:10, "gold ore":11, "iron ore":12, "coal":13,
+	log:14, leaves:15, sponge:16, glass:17, wool:18, "yellow flower":19, "red flower":20, "brown mushroom":21,
+	"red mushroom":22, "gold":23, "iron":24, "two half blocks":25, "half block":26,
+	brick:27, explosives:28, bookshelf:29, "mossy cobblestone":30, obsidian:31 };
 
 
 function defaultPalette() {

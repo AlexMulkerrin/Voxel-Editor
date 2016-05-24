@@ -1,9 +1,9 @@
 function ImageLoader(display) {
-	var textureNames = ["bookshelf","explosives","brick","cobblestone","dirt",
-	"red flower","yellow flower","glass","gold ore","gold","grass","gravel",
-	"half block","iron ore","iron","lava","leaves","log","mossy cobblestone",
-	"obsidian","planks","sand","sponge","stone","water","wool","coal","bedrock",
-	"brown mushroom","red mushroom","two half blocks","sapling"];
+	var textureNames = ["stone", "grass", "dirt", "cobblestone", "planks", "sapling",
+	"bedrock", "water", "lava", "sand", "gravel", "gold ore", "iron ore", "coal",
+	 "log", "leaves", "sponge", "glass", "wool", "yellow flower", "red flower",
+	 "brown mushroom", "red mushroom", "gold", "iron", "two half blocks",
+	 "half block", "brick", "explosives", "bookshelf", "mossy cobblestone", "obsidian"];
 	this.totalImages = textureNames.length;
 	this.loadedImages = 0;
 	this.blockImage = [];

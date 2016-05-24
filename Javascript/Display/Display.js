@@ -5,6 +5,9 @@ function Display(canvasName, schematic, control) {
 	this.canvas = document.getElementById(canvasName);
 	this.ctx = this.canvas.getContext("2d");
 
+	this.topdown = new TopdownRender(schematic);
+	this.topdown.loadImages();
+
 	this.render = new IsometricRender(schematic);
 	this.minimap = new IsometricRender(schematic);
 	this.imageLoader = new ImageLoader(this);
@@ -54,17 +57,22 @@ Display.prototype.resizeCanvas = function () {
 
 	if (this.targetControl.currentTabView === viewTabID.isometric) {
 		this.render.resizeTileSize(this.maxViewWidth, this.maxViewHeight);
-	}
+	}// else if (this.targetControl.currentTabView === viewTabID.slice) {
+	//	this.topdown.resizeTileSize(this.maxViewWidth, this.maxViewHeight);
+	//}
 
 	this.targetControl.repositionButtons();
 	this.refresh();
 }
 Display.prototype.updatePalette = function() {
+	this.topdown.createRender();
 	this.render.createRender();
 	this.minimap.createRender();
 	this.refresh();
 }
 Display.prototype.updateRender = function() {
+	var sliceHeight = this.targetControl.view.sliceHeight;
+	this.topdown.updateRender(sliceHeight);
 	this.render.updateRender();
 	this.minimap.updateRender();
 	this.refresh();
@@ -96,6 +104,15 @@ Display.prototype.clearCanvas = function() {
 }
 
 Display.prototype.drawSlice = function() {
+	this.topdown.tileSize = this.targetControl.view.pixelPerCell+1;
+	var tx = this.targetControl.view.x;
+	var ty = this.targetControl.view.y;
+	if (this.topdown.cutoff !== this.targetControl.view.sliceHeight) {
+		this.topdown.updateRender(this.targetControl.view.sliceHeight);
+	}
+	this.ctx.drawImage(this.topdown.outputImage, tx, ty);
+
+	/*
 	var model = this.targetSchematic;
 	var sqSize = this.targetControl.view.pixelPerCell;
 	if (sqSize > 1) {
@@ -123,7 +140,7 @@ Display.prototype.drawSlice = function() {
 			}
 			this.drawRectOnView(i * sqSize, k * sqSize, sqSize - 1, sqSize - 1);
         }
-    }
+    }*/
 }
 
 Display.prototype.drawIsometricRender = function() {
@@ -230,8 +247,12 @@ Display.prototype.drawSideBar = function() {
 	this.ctx.fillStyle = "#000033";
     this.ctx.fillText("Currently selected block: #"+current, px, 300);
 	this.ctx.fillText("name: "+palette[current].name, px, 320);
-	this.ctx.fillText("material: "+palette[current].material, px, 340);
+	this.ctx.fillText("texture: "+palette[current].texture, px, 340);
 	this.ctx.fillText("colour code: "+palette[current].colour, px, 360);
+
+	this.ctx.fillText("model: "+palette[current].model, px+120, 320);
+	this.ctx.fillText("material: "+palette[current].material, px+120, 340);
+	this.ctx.fillText("orientation: -", px+120, 360);
 }
 
 Display.prototype.drawColourPicker = function() {

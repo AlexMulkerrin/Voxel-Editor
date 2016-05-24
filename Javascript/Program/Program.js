@@ -64,6 +64,7 @@ Program.prototype.handleLoadedText = function(loadedText) {
 		this.control.view.sliceHeight = 0;
 		this.control.currentPalette = 2;
 		this.display.resizeCanvas();
+		this.display.minimap.resizeTileSize(200, 200);
 		this.display.updatePalette();
 		this.control.createButtons();
 }

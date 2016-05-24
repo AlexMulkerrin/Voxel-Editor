@@ -20,15 +20,15 @@ IsometricRender.prototype.setBlockImages = function(images) {
 
 // create render method called when block image is loaded or when schematic
 // palette is updated and tilesheet needs to be re-populated.
-IsometricRender.prototype.createRender = function () {
+IsometricRender.prototype.createRender = function() {
   this.createTileSheet();
   this.updateRender();
 }
 
-IsometricRender.prototype.resizeTileSize = function (width, height) {
-	var model = this.targetSchematic
-	maxXSize = (2*width)/(model.width+model.depth+2);
-	maxYSize = (4*height)/(model.width+model.depth+2*model.height+4);
+IsometricRender.prototype.resizeTileSize = function(width, height) {
+	var model = this.targetSchematic;
+	var maxXSize = (2*width)/(model.width+model.depth+2);
+	var maxYSize = (4*height)/(model.width+model.depth+2*model.height+4);
 	this.tileSize = Math.floor(Math.min(maxXSize,maxYSize));
 
 	this.createRender();
