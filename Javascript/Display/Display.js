@@ -88,6 +88,7 @@ Display.prototype.refresh = function() {
   this.drawSideBar();
   this.drawColourPicker();
   this.drawInfo();
+  this.drawLayerToolBar();
 
 	if (this.targetControl.currentTabView === viewTabID.isometric) {
 		this.drawIsometricRender();
@@ -111,45 +112,13 @@ Display.prototype.drawSlice = function() {
 		this.topdown.updateRender(this.targetControl.view.sliceHeight);
 	}
 	this.ctx.drawImage(this.topdown.outputImage, tx, ty);
-
-	/*
-	var model = this.targetSchematic;
-	var sqSize = this.targetControl.view.pixelPerCell;
-	if (sqSize > 1) {
-        this.ctx.fillStyle = "#eeeeee";
-    } else {
-        this.ctx.fillStyle = "#ffffff";
-    }
-    this.drawRectOnView(0, 0, model.width * sqSize, model.depth *  sqSize);
-
-	this.ctx.fillStyle = "#ffffff";
-	var sliceHeight = this.targetControl.view.sliceHeight;
-    for (var i = 0; i < model.width; i++) {
-        for (var k = 0; k < model.depth; k++) {
-
-			var id = model.block[i][sliceHeight][k];
-			if (sliceHeight>0 && model.isTransparent(i,sliceHeight,k)) {
-				if (model.isTransparent(i,sliceHeight-1,k)) {
-					this.ctx.fillStyle = model.palette[id].colour;
-				} else {
-					var id = model.block[i][sliceHeight-1][k];
-					this.ctx.fillStyle = colourBlend(model.palette[id].colour, model.palette[0].colour);
-				}
-			} else {
-				this.ctx.fillStyle = model.palette[id].colour;
-			}
-			this.drawRectOnView(i * sqSize, k * sqSize, sqSize - 1, sqSize - 1);
-        }
-    }*/
 }
-
 Display.prototype.drawIsometricRender = function() {
 	this.drawRectangle(this.targetControl.view.borderLeft, this.targetControl.view.borderTop, this.maxViewWidth, this.maxViewHeight, this.targetSchematic.palette[0].colour);
   	var tx = this.targetControl.view.borderLeft + (this.maxViewWidth - this.render.outputImage.width)/2;
   	var ty = this.targetControl.view.borderTop + (this.maxViewHeight - this.render.outputImage.height)/2;
   	this.ctx.drawImage(this.render.outputImage, tx, ty);
 }
-
 Display.prototype.drawMinimap = function() {
 	this.drawRectangle(this.canvas.width-215, 48, 215, 215, this.targetSchematic.palette[0].colour);
 	var tx= (215 - this.minimap.outputImage.width)/2;
@@ -253,6 +222,22 @@ Display.prototype.drawSideBar = function() {
 	this.ctx.fillText("model: "+palette[current].model, px+120, 320);
 	this.ctx.fillText("material: "+palette[current].material, px+120, 340);
 	this.ctx.fillText("orientation: -", px+120, 360);
+}
+Display.prototype.drawLayerToolBar = function() {
+	var height = this.targetSchematic.height-1;
+	var sliceHeight = this.targetControl.view.sliceHeight;
+	var step = (this.canvas.height-100)/height;
+
+	this.ctx.fillStyle = "#216778";
+	this.ctx.fillRect(50, 50, 5, this.canvas.height-100);
+	for (var i=0; i<=height; i++) {
+		this.ctx.fillRect(45, 50 + (height-i)*step, 15, 5);
+	}
+	this.ctx.fillStyle = "#22BCFE";
+	this.ctx.fillRect(25, 50 + (height-sliceHeight)*step, 50, 5);
+	this.ctx.fillStyle = "#000033";
+	this.ctx.fillText(sliceHeight, 10, 55 + (height-sliceHeight)*step);
+
 }
 
 Display.prototype.drawColourPicker = function() {

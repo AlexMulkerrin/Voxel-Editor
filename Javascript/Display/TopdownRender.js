@@ -113,18 +113,30 @@ TopdownRender.prototype.updateRender = function(sliceHeight) {
 		for (var k=0; k<model.depth; k++) {
 			var id = model.block[i][sliceHeight][k];
 			var blockType = model.palette[id].model;
+
+
+			if (model.isTransparent(i,sliceHeight,k) && sliceHeight>0) {
+				// display lower layers faded out
+				var j = sliceHeight-1;
+				while (j>0) {
+					if ( !model.isTransparent(i,j,k)) break;
+					j--;
+				}
+				var lowerId = model.block[i][j][k];
+				var lowerBlockType = model.palette[lowerId].model;
+				if (lowerBlockType !== "none") {
+					var tx = lowerId*16;
+					ctx.globalAlpha=0.5;
+					ctx.drawImage(this.tileSheet, tx, 0, 16, 16, i*size, k*size, size-1, size-1);
+					ctx.globalAlpha=1;
+				}
+			}
+
 			if (blockType !== "none") {
 				var tx = id*16;
 				ctx.drawImage(this.tileSheet, tx, 0, 16, 16, i*size, k*size, size-1, size-1);
-
-				//ctx.fillStyle = model.palette[id].colour;
-				//ctx.fillRect(i*size, k*size, size, size);
-
-				//ctx.putImageData(this.blockImage[0],0,0);
-
-				//ctx.drawImage(this.tileSheet,0,0);
-				//ctx.drawImage(this.textureAtlas,0,0);
 			}
+
 		}
 	}
 }
