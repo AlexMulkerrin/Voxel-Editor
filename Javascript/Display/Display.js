@@ -328,7 +328,7 @@ Display.prototype.drawTooltips = function () {
 	}
 }
 Display.prototype.drawCursor = function() {
-	var sqSize = this.targetControl.view.pixelPerCell;
+	var sqSize = this.targetControl.view.pixelPerCell+1;
 	var offset = sqSize/4;
 	var width = sqSize/2;
 	var mouse = this.targetControl.mouse;

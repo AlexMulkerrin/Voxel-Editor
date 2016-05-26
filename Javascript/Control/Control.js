@@ -173,7 +173,7 @@ Control.prototype.checkHover = function () {
 }
 Control.prototype.checkLattice = function () {
     this.mouse.isOverWorkspace = true;
-    var cellSize = this.view.cellPerPixel/this.view.pixelPerCell;
+    var cellSize = this.view.cellPerPixel/(this.view.pixelPerCell+1);
     this.mouse.latticeX = Math.floor((this.mouse.x - this.view.x) * cellSize);
 	this.mouse.latticeY = this.view.sliceHeight;
     this.mouse.latticeZ = Math.floor((this.mouse.y - this.view.y) * cellSize);
@@ -379,6 +379,7 @@ Control.prototype.rotateRender = function(direc) {
 	if (rotation < 0) rotation = 3;
 	if (rotation > 3) rotation = 0;
 	this.targetDisplay.render.rotation = rotation;
+	this.targetDisplay.minimap.rotation = rotation;
 	this.targetDisplay.updateRender();
 }
 
@@ -466,13 +467,14 @@ Control.prototype.scrollRight = function() {
 
 // change schematic size
 Control.prototype.increaseSize = function() {
-	this.targetSchematic.increaseSize();
+	this.targetSchematic.changeSize(2,2,2);
+	this.view.sliceHeight++;
 	this.fitToWindow();
 	this.targetDisplay.minimap.resizeTileSize(200,200);
 	this.targetDisplay.updateRender();
 }
 Control.prototype.decreaseSize = function() {
-	this.targetSchematic.decreaseSize();
+	this.targetSchematic.decreaseSize(1,1,1);
 	if (this.view.sliceHeight >= this.targetSchematic.height) {
 		this.view.sliceHeight = this.targetSchematic.height -1;
 	}
@@ -518,6 +520,11 @@ Control.prototype.fitToWindow = function() {
         this.view.pixelPerCell = this.view.pixelPerCell / 2;
     }
     this.view.cellPerPixel = 1;
+
+	if (this.targetDisplay.topdown.tileSize !== this.view.pixelPerCell+1) {
+		this.targetDisplay.topdown.tileSize = this.view.pixelPerCell+1;
+		this.targetDisplay.updateRender();
+	}
 
     var workspaceWidth = model.width * this.view.pixelPerCell / this.view.cellPerPixel;
     var workspaceHeight = model.depth * this.view.pixelPerCell / this.view.cellPerPixel;

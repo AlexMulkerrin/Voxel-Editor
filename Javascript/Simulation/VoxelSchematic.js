@@ -54,12 +54,43 @@ VoxelSchematic.prototype.removePaletteEntry = function(id) {
 	//this.palette.push(newEntry);
 }
 
-VoxelSchematic.prototype.decreaseSize = function() {
-	this.width = this.width-1;
+VoxelSchematic.prototype.changeSize = function(deltaX, deltaY, deltaZ) {
+	var offsetX = Math.floor(deltaX/2);
+	var newWidth = this.width + deltaX;
+	if (newWidth === 0) newWidth = 1;
+
+	var offsetY = Math.floor(deltaY/2);
+	var newHeight = this.height + deltaY;
+	if (newHeight === 0) newHeight = 1;
+
+	var offsetZ = Math.floor(deltaZ/2);
+	var newDepth = this.depth + deltaZ;
+	if (newDepth === 0) newDepth = 1;
+
+	var newBlock = create3DArray(newWidth, newHeight, newDepth, 0);
+	for (var i=0; i<this.width; i++) {
+		for (var j=0; j<this.height; j++) {
+			for (var k=0; k<this.depth; k++) {
+				newBlock[i+offsetX][j+offsetY][k+offsetZ] = this.block[i][j][k];
+			}
+		}
+	}
+	this.width = newWidth;
+	this.height = newHeight;
+	this.depth = newDepth;
+	this.block = newBlock;
+
+	this.visible = create3DArray(this.width, this.height, this.depth, false);
+	this.checkVisible();
+
+}
+
+VoxelSchematic.prototype.decreaseSize = function(deltaX, deltaY, deltaZ) {
+	this.width = this.width-deltaX;
 	if (this.width == 0) this.width = 1;
-	this.height = this.height-1;
+	this.height = this.height-deltaY;
 	if (this.height == 0) this.height = 1;
-	this.depth = this.depth-1;
+	this.depth = this.depth-deltaZ;
 	if (this.depth == 0) this.depth = 1;
 
 	var newBlock = create3DArray(this.width, this.height, this.depth, 0);
@@ -76,8 +107,8 @@ VoxelSchematic.prototype.decreaseSize = function() {
 	this.checkVisible();
 
 }
-VoxelSchematic.prototype.increaseSize = function() {
-	var newBlock = create3DArray(this.width+1, this.height+1, this.depth+1, 0);
+VoxelSchematic.prototype.increaseSize = function(deltaX, deltaY, deltaZ) {
+	var newBlock = create3DArray(this.width+deltaX, this.height+deltaY, this.depth+deltaZ, 0);
 	for (var i=0; i<this.width; i++) {
 		for (var j=0; j<this.height; j++) {
 			for (var k=0; k<this.depth; k++) {
@@ -86,9 +117,9 @@ VoxelSchematic.prototype.increaseSize = function() {
 		}
 	}
 
-	this.width = this.width+1;
-	this.height = this.height+1;
-	this.depth = this.depth+1;
+	this.width = this.width+deltaX;
+	this.height = this.height+deltaY;
+	this.depth = this.depth+deltaZ;
 
 	this.block = newBlock;
 
