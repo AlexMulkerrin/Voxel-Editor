@@ -86,18 +86,32 @@ VoxelSchematic.prototype.changeSize = function(deltaX, deltaY, deltaZ) {
 }
 
 VoxelSchematic.prototype.decreaseSize = function(deltaX, deltaY, deltaZ) {
-	this.width = this.width-deltaX;
-	if (this.width == 0) this.width = 1;
-	this.height = this.height-deltaY;
-	if (this.height == 0) this.height = 1;
-	this.depth = this.depth-deltaZ;
-	if (this.depth == 0) this.depth = 1;
+	var offsetX = Math.floor(deltaX/2);
+	this.width = this.width - deltaX;
+	if (this.width <= 0) {
+		this.width = 1;
+		offsetX = 0;
+	}
+
+	var offsetY = Math.floor(deltaY/2);
+	this.height = this.height - deltaY;
+	if (this.height <= 0) {
+		this.height = 1;
+		offsetY = 0;
+	}
+
+	var offsetZ = Math.floor(deltaZ/2);
+	this.depth = this.depth - deltaZ;
+	if (this.depth <= 0) {
+		this.depth = 1;
+		offsetZ = 0;
+	}
 
 	var newBlock = create3DArray(this.width, this.height, this.depth, 0);
 	for (var i=0; i<this.width; i++) {
 		for (var j=0; j<this.height; j++) {
 			for (var k=0; k<this.depth; k++) {
-				newBlock[i][j][k] = this.block[i][j][k];
+				newBlock[i][j][k] = this.block[i+offsetX][j+offsetY][k+offsetZ];
 			}
 		}
 	}
@@ -125,6 +139,56 @@ VoxelSchematic.prototype.increaseSize = function(deltaX, deltaY, deltaZ) {
 
 	this.visible = create3DArray(this.width, this.height, this.depth, false);
 	this.checkVisible();
+}
+
+VoxelSchematic.prototype.trimEdges = function() {
+	var left = this.width-1;
+	var right = 0;
+	var bottom = this.height-1;
+	var top = 0;
+	var front = this.depth-1;
+	var back = 0;
+	
+	for (var i = 0; i < this.width; i++) {
+        for (var j = 0; j < this.height; j++) {
+			for (var k = 0; k < this.depth; k++) {
+            	var id = this.block[i][j][k];
+				if (this.palette[id].model !== "none") {
+					if (i < left) left = i;
+					if (i > right) right = i;
+					
+					if (j < bottom) bottom = j;
+					if (j > top) top = j;
+					
+					if (k < front) front = k;
+					if (k > back) back = k;
+				}
+			}
+        }
+    }
+	var newWidth = 1 + right - left;
+	if (newWidth <= 0) newWidth = 1;
+	var newHeight= 1 + top - bottom;
+	if (newHeight <= 0) newHeight = 1;
+	var newDepth = 1 + back - front;
+	if (newDepth <= 0) newDepth = 1;
+	
+	var newBlock = create3DArray(newWidth, newHeight, newDepth, 0);
+	for (var i=0; i<newWidth; i++) {
+		for (var j=0; j<newHeight; j++) {
+			for (var k=0; k<newDepth; k++) {
+				newBlock[i][j][k] = this.block[i+left][j+bottom][k+front];
+			}
+		}
+	}
+	this.width = newWidth;
+	this.height = newHeight;
+	this.depth = newDepth;
+	this.block = newBlock;
+
+	this.visible = create3DArray(this.width, this.height, this.depth, false);
+	this.checkVisible();
+	
 }
 
 VoxelSchematic.prototype.setVolume = function(start, end, id) {

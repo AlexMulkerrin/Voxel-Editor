@@ -305,7 +305,11 @@ Control.prototype.createButtons = function () {
     this.button.push(  new Button(c.width - (16+this.view.borderRight), c.height - 42, 16, 16, 15, "D", "scrollRight") );
 
     // size and scale
-    //this.button.push(  new Button(3, c.height - 23, 20, 20, 19, "resize") );
+    this.button.push(  new Button(3, c.height - 23, 20, 20, 16, "", "trimEdges") );
+	this.button.push(  new Button(23, c.height - 23, 20, 20, null, "", "increaseSize", [2,0,0]) );
+	this.button.push(  new Button(47, c.height - 23, 20, 20, null, "", "increaseSize", [0,1,0]) );
+	this.button.push(  new Button(71, c.height - 23, 20, 20, null, "", "increaseSize", [0,0,2]) );
+	
 	this.button.push(  new Button(95, c.height - 23, 20, 9, 3, "N", "increaseSize") );
 	this.button.push(  new Button(95, c.height - 12, 20, 9, 4, "M", "decreaseSize") );
 
@@ -466,15 +470,20 @@ Control.prototype.scrollRight = function() {
 }
 
 // change schematic size
-Control.prototype.increaseSize = function() {
-	this.targetSchematic.changeSize(2,2,2);
-	this.view.sliceHeight++;
+Control.prototype.increaseSize = function(axis) {
+	if (axis) {
+		this.targetSchematic.changeSize(axis[0],axis[1],axis[2]);
+	} else {
+		this.targetSchematic.changeSize(2,2,2);
+		this.view.sliceHeight++;
+	}
+	
 	this.fitToWindow();
 	this.targetDisplay.minimap.resizeTileSize(200,200);
 	this.targetDisplay.updateRender();
 }
 Control.prototype.decreaseSize = function() {
-	this.targetSchematic.decreaseSize(1,1,1);
+	this.targetSchematic.decreaseSize(2,2,2);
 	if (this.view.sliceHeight >= this.targetSchematic.height) {
 		this.view.sliceHeight = this.targetSchematic.height -1;
 	}
@@ -482,8 +491,17 @@ Control.prototype.decreaseSize = function() {
 	this.targetDisplay.minimap.resizeTileSize(200,200);
 	this.targetDisplay.updateRender();
 }
+Control.prototype.trimEdges = function() {
+	this.targetSchematic.trimEdges();
+	if (this.view.sliceHeight >= this.targetSchematic.height) this.view.sliceHeight = this.targetSchematic.height-1;
+	this.fitToWindow();
+	this.targetDisplay.minimap.resizeTileSize(200,200);
+	this.targetDisplay.updateRender();
+}
+
 Control.prototype.noEffect = function() {
 }
+
 
 // change displayed slice
 Control.prototype.shiftViewUp = function() {
