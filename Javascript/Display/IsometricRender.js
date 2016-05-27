@@ -111,30 +111,36 @@ IsometricRender.prototype.updateRender = function() {
   var zxcomp = rotationTransforms[this.rotation][1][0];
   var zzcomp = rotationTransforms[this.rotation][1][1];
 
-  for (var i=0; i<model.width; i++) {
-    for (var k=0; k<model.depth; k++) {
+	var longestAxis = Math.max(model.width, model.depth);
+
+  for (var i=0; i<longestAxis; i++) {
+    for (var k=0; k<longestAxis; k++) {
       for (var j=0; j<model.height; j++) {
 
         nx =  xxcomp<0 ? model.width - (1+i) : i*xxcomp;
-        nx += xzcomp<0 ? model.depth - (1+k) : k*xzcomp;
-        nz =  zxcomp<0 ? model.width - (1+i) : i*zxcomp;
+        nx += xzcomp<0 ? model.width - (1+k) : k*xzcomp;
+        nz =  zxcomp<0 ? model.depth - (1+i) : i*zxcomp;
         nz += zzcomp<0 ? model.depth - (1+k) : k*zzcomp;
 
-        var id = model.block[nx][j][nz];
-        var material = model.palette[id].model;
-        if ( !(material == "none") ) {
-          if (model.visible[nx][j][nz] || j == this.cutoff) {
-            if (material == "transparent") ctx.globalAlpha=0.7;
+		// Temporary bugfix!
+		if (nx < model.width && nz < model.depth && nx >= 0 && nz >= 0) {
 
-            var tx = id*size;
-            var ty = 0;
-            var x = model.depth*half + i*half -k*half;
-            var y = model.height*half + i*quarter + k*quarter - j*half;
-            ctx.drawImage(this.tileSheet,tx,ty,size,size, x,y,size,size);
-            if (material == "transparent") ctx.globalAlpha=1;
-          }
-        }
-      }
+	        var id = model.block[nx][j][nz];
+	        var material = model.palette[id].model;
+	        if ( !(material == "none") ) {
+	          if (model.visible[nx][j][nz] || j == this.cutoff) {
+	            if (material == "transparent") ctx.globalAlpha=0.7;
+
+	            var tx = id*size;
+	            var ty = 0;
+	            var x = model.depth*half + i*half -k*half;
+	            var y = model.height*half + i*quarter + k*quarter - j*half;
+	            ctx.drawImage(this.tileSheet,tx,ty,size,size, x,y,size,size);
+	            if (material == "transparent") ctx.globalAlpha=1;
+	          }
+	        }
+	      }
+  		}
     }
   }
 }

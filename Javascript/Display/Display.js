@@ -333,18 +333,19 @@ Display.prototype.drawCursor = function() {
 	var width = sqSize/2;
 	var mouse = this.targetControl.mouse;
 
-	if (mouse.isPressed) {
-		this.ctx.fillStyle = "#9FAEC2";
-		this.drawRectOnView(mouse.oldLatticeX*sqSize+offset, mouse.oldLatticeZ*sqSize+offset, width, width);
-		this.drawRectOnView(mouse.oldLatticeX*sqSize+width, mouse.oldLatticeZ*sqSize+width, 2, (mouse.latticeZ-mouse.oldLatticeZ)*sqSize);
-		this.drawRectOnView(mouse.oldLatticeX*sqSize+width, mouse.oldLatticeZ*sqSize+width, (mouse.latticeX-mouse.oldLatticeX)*sqSize, 2);
-		this.drawRectOnView(mouse.latticeX*sqSize+width, mouse.latticeZ*sqSize+width, 2, (mouse.oldLatticeZ-mouse.latticeZ)*sqSize);
-		this.drawRectOnView(mouse.latticeX*sqSize+width, mouse.latticeZ*sqSize+width, (mouse.oldLatticeX-mouse.latticeX)*sqSize, 2);
+	if (mouse.isOverWorkspace) {
+		if (mouse.isPressed) {
+			this.ctx.fillStyle = "#9FAEC2";
+			this.drawRectOnView(mouse.oldLatticeX*sqSize+offset, mouse.oldLatticeZ*sqSize+offset, width, width);
+			this.drawRectOnView(mouse.oldLatticeX*sqSize+width, mouse.oldLatticeZ*sqSize+width, 2, (mouse.latticeZ-mouse.oldLatticeZ)*sqSize);
+			this.drawRectOnView(mouse.oldLatticeX*sqSize+width, mouse.oldLatticeZ*sqSize+width, (mouse.latticeX-mouse.oldLatticeX)*sqSize, 2);
+			this.drawRectOnView(mouse.latticeX*sqSize+width, mouse.latticeZ*sqSize+width, 2, (mouse.oldLatticeZ-mouse.latticeZ)*sqSize);
+			this.drawRectOnView(mouse.latticeX*sqSize+width, mouse.latticeZ*sqSize+width, (mouse.oldLatticeX-mouse.latticeX)*sqSize, 2);
+		}
+
+		this.ctx.fillStyle = "#22BCFE";
+	    this.drawRectOnView(mouse.latticeX*sqSize+offset, mouse.latticeZ*sqSize+offset, width, width);
 	}
-
-	this.ctx.fillStyle = "#22BCFE";
-    this.drawRectOnView(mouse.latticeX*sqSize+offset, mouse.latticeZ*sqSize+offset, width, width);
-
 }
 
 Display.prototype.getRenderImage = function () {

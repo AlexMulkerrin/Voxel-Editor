@@ -24,7 +24,8 @@ Program.prototype.createOpenPrompt = function () {
 	input.setAttribute("type", "file");
 	document.body.appendChild(input);
 	input.onchange = function (event) {
-		t.schematic.fileName = input.value
+		var trimmedFileName = input.value.split(".")[0];
+		t.schematic.fileName = trimmedFileName;//input.value
 		if (getFileNameExtension(input.value) === "png") {
 			t.loadEncodedImage(input);
 		} else {

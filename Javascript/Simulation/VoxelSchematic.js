@@ -31,7 +31,7 @@ VoxelSchematic.prototype.clear = function() {
 
 VoxelSchematic.prototype.extendPalette = function() {
 	var index = this.palette.length;
-	var newEntry = {name:"block #"+index, material:"solid", colour:"#ff00ff"};
+	var newEntry = {name:"block #"+index, material:"wood", colour:"#ffffd1", model:"solid", texture:"planks", customColour:true};
 	this.palette.push(newEntry);
 }
 
@@ -148,7 +148,7 @@ VoxelSchematic.prototype.trimEdges = function() {
 	var top = 0;
 	var front = this.depth-1;
 	var back = 0;
-	
+
 	for (var i = 0; i < this.width; i++) {
         for (var j = 0; j < this.height; j++) {
 			for (var k = 0; k < this.depth; k++) {
@@ -156,10 +156,10 @@ VoxelSchematic.prototype.trimEdges = function() {
 				if (this.palette[id].model !== "none") {
 					if (i < left) left = i;
 					if (i > right) right = i;
-					
+
 					if (j < bottom) bottom = j;
 					if (j > top) top = j;
-					
+
 					if (k < front) front = k;
 					if (k > back) back = k;
 				}
@@ -172,7 +172,7 @@ VoxelSchematic.prototype.trimEdges = function() {
 	if (newHeight <= 0) newHeight = 1;
 	var newDepth = 1 + back - front;
 	if (newDepth <= 0) newDepth = 1;
-	
+
 	var newBlock = create3DArray(newWidth, newHeight, newDepth, 0);
 	for (var i=0; i<newWidth; i++) {
 		for (var j=0; j<newHeight; j++) {
@@ -188,7 +188,7 @@ VoxelSchematic.prototype.trimEdges = function() {
 
 	this.visible = create3DArray(this.width, this.height, this.depth, false);
 	this.checkVisible();
-	
+
 }
 
 VoxelSchematic.prototype.setVolume = function(start, end, id) {

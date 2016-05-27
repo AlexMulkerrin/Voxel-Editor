@@ -166,7 +166,7 @@ Control.prototype.checkHover = function () {
             }
         }
     }
-    if (this.mouse.isOverButton === false) {
+    if (this.mouse.isOverButton === false && this.currentTabView === viewTabID.slice) {
         this.checkLattice();
     }
     this.targetDisplay.refresh();
@@ -309,7 +309,7 @@ Control.prototype.createButtons = function () {
 	this.button.push(  new Button(23, c.height - 23, 20, 20, null, "", "increaseSize", [2,0,0]) );
 	this.button.push(  new Button(47, c.height - 23, 20, 20, null, "", "increaseSize", [0,1,0]) );
 	this.button.push(  new Button(71, c.height - 23, 20, 20, null, "", "increaseSize", [0,0,2]) );
-	
+
 	this.button.push(  new Button(95, c.height - 23, 20, 9, 3, "N", "increaseSize") );
 	this.button.push(  new Button(95, c.height - 12, 20, 9, 4, "M", "decreaseSize") );
 
@@ -477,7 +477,7 @@ Control.prototype.increaseSize = function(axis) {
 		this.targetSchematic.changeSize(2,2,2);
 		this.view.sliceHeight++;
 	}
-	
+
 	this.fitToWindow();
 	this.targetDisplay.minimap.resizeTileSize(200,200);
 	this.targetDisplay.updateRender();

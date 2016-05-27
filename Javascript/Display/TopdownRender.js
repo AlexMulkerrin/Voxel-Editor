@@ -119,7 +119,7 @@ TopdownRender.prototype.updateRender = function(sliceHeight) {
 				// display lower layers faded out
 				var j = sliceHeight-1;
 				while (j>0) {
-					if ( !model.isTransparent(i,j,k)) break;
+					if ( model.visible[i][j][k]) break;//!model.isTransparent(i,j,k)) break;
 					j--;
 				}
 				var lowerId = model.block[i][j][k];
