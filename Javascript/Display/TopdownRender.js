@@ -9,13 +9,16 @@ function TopdownRender(schematic) {
 	this.tileSize = 16;
 
 	this.blockImage = [];
-	this.loadImages();
+	this.prepareBlockImages();
 }
-TopdownRender.prototype.loadImages = function() {
+TopdownRender.prototype.prepareBlockImages = function() {
+	/*
 	this.textureAtlas = new Image();
 	this.textureAtlas.crossOrigin = "Anonymous";
 	this.textureAtlas.src = "Resources/Images/TextureAtlas.png";
-
+	this.textureAtlas.width = 128;
+	this.textureAtlas.height = 128;
+	
 	var t = this;
 	this.textureAtlas.onload = function() {
 		t.tempCanvas.width = t.textureAtlas.width;
@@ -30,11 +33,26 @@ TopdownRender.prototype.loadImages = function() {
 		}
 		t.createTileSheet();
 	}
+	*/
+	// NEW don't load an image to manipulate as it raises cross origin warnings.
+	this.tempCanvas.width = 128;
+	this.tempCanvas.height = 128;
+	var ctx = this.tempCanvas.getContext("2d");
+	ctx.fillStyle = "#ffffff";
+	ctx.fillRect(0,0,this.tempCanvas.width,this.tempCanvas.height);
+
+	for (var j=0; j<8; j++) {
+		for (var i=0; i<8; i++) {
+			this.blockImage[i+j*8] = ctx.getImageData(i*16, j*16, 16, 16);
+		}
+	}
+	this.createTileSheet();
+	
 }
 
 TopdownRender.prototype.createRender = function() {
-  this.createTileSheet();
-  this.updateRender(0);
+	this.createTileSheet();
+	this.updateRender(0);
 }
 TopdownRender.prototype.resizeTileSize = function(width,height) {
 	var model = this.targetSchematic;
@@ -64,6 +82,8 @@ TopdownRender.prototype.createTileSheet = function() {
 
 	for (var i=0; i<palette.length; i++) {
 		var textureIndex = textureID[palette[i].texture] || 0;
+		
+		/*
 		tempCtx.putImageData(this.blockImage[textureIndex], 0, 0, 0, 0, size, size);
 		var imageData = tempCtx.getImageData(0,0, size, size);
 		// clear temp canvas after use
@@ -88,6 +108,24 @@ TopdownRender.prototype.createTileSheet = function() {
 			data[j+2] = Math.floor(blue);
 		}
 		ctx.putImageData(imageData, i*size, 0);
+		*/
+		
+		// NEW getting rid of use of Minecraft textures
+		tempCtx.putImageData(this.blockImage[textureIndex], 0, 0, 0, 0, size, size);
+		var imageData = tempCtx.getImageData(0,0, size, size);
+		var data = imageData.data;
+		var blockColour = colourComponents(palette[i].colour);
+
+		for (var j=0; j<data.length; j += 4) {
+			var red = blockColour[0];
+			var green = blockColour[1];
+			var blue = blockColour[2];
+			data[j] = Math.floor(red);
+			data[j+1] = Math.floor(green);
+			data[j+2] = Math.floor(blue);
+		}
+		ctx.putImageData(imageData, i*size, 0);
+		
 	}
 }
 
@@ -104,7 +142,7 @@ TopdownRender.prototype.updateRender = function(sliceHeight) {
 	this.outputImage.height = model.depth*size;
 	var ctx = this.outputImage.getContext("2d");
 	ctx.imageSmoothingEnabled = false;
-	ctx.mozImageSmoothingEnabled =  false;
+	//ctx.mozImageSmoothingEnabled =  false;
 
 	ctx.fillStyle = model.palette[0].colour;
 	ctx.fillRect(0, 0, this.outputImage.width, this.outputImage.height);

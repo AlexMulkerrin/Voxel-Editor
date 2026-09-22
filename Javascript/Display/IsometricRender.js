@@ -1,5 +1,4 @@
-// Isometric Renderer creates an HTML5 canvas with render output upon it which can be
-// given to Display object to draw.
+// Isometric Renderer creates an HTML5 canvas with render output upon it which can be given to Display object to draw.
 function IsometricRender(schematic) {
   this.targetSchematic = schematic;
   this.rotation = 0;
@@ -37,21 +36,21 @@ IsometricRender.prototype.resizeTileSize = function(width, height) {
 // creates a tilesheet with default block image adjusted to match each
 // colouration present in schematic palette.
 IsometricRender.prototype.createTileSheet = function (sourceImage) {
-  var palette = this.targetSchematic.palette;
-  this.tileSheet.width = palette.length*this.tileSize;
-  this.tileSheet.height = this.tileSize;
-  var ctx = this.tileSheet.getContext("2d");
-  this.tempCanvas.width = this.tileSize;
-  this.tempCanvas.height = this.tileSize;
-  var tempCtx = this.tempCanvas.getContext("2d");
+	let palette = this.targetSchematic.palette;
+	this.tileSheet.width = palette.length*this.tileSize;
+	this.tileSheet.height = this.tileSize;
+	let ctx = this.tileSheet.getContext("2d");
+	this.tempCanvas.width = this.tileSize;
+	this.tempCanvas.height = this.tileSize;
+	let tempCtx = this.tempCanvas.getContext("2d");
 
-  //clear temp canvas to be used after each tile is drawn
-  var clearRect = tempCtx.createImageData(this.tileSize, this.tileSize);
-  for (var i=0; i<clearRect.data.length; i++) {
-	clearRect.data[i] = 0;
-  }
+	// temp canvas in cleared state to be used after each tile is drawn
+	let clearRect = tempCtx.createImageData(this.tileSize, this.tileSize);
+	for (let i=0; i<clearRect.data.length; i++) {
+		clearRect.data[i] = 0;
+	}
 
-
+	/*
   for (var i=0; i<palette.length; i++) {
 	  var textureIndex = textureID[palette[i].texture];
 
@@ -88,6 +87,48 @@ IsometricRender.prototype.createTileSheet = function (sourceImage) {
       data[j] = oldData[j];
     }
   }
+  */
+  
+	// NEW don't bother loading images of isometric textured cubes. Instead generate then with a function
+	ctx.fillStyle
+	for (let i=0; i<palette.length; i++) {
+		//tempCtx.fillStyle = "#ffffff";
+		//tempCtx.fillRect(0, 0, this.tileSize, this.tileSize);
+		this.drawIsometricCube(tempCtx, 0, 0, this.tileSize, "#ffffff",true);
+		
+		let imageData = tempCtx.getImageData(0, 0, this.tileSize, this.tileSize);
+		// wipe temp canvas for next
+		tempCtx.putImageData(clearRect,0,0);
+		let data = imageData.data;
+		
+		let blockColour = colourComponents("#ffffff");
+		//if (palette[i].customColour) {
+			blockColour = colourComponents(palette[i].colour);
+		//}
+
+		let oldData = [];
+		for (let j=0; j<data.length; j++) {
+			oldData[j] = data[j];
+		}
+
+		for (let j=0; j<data.length; j += 4) {
+			let oldRed = data[j];
+			let oldGreen = data[j+1];
+			let oldBlue = data[j+2];
+			let red = (blockColour[0] * oldRed)/255;
+			let green = (blockColour[1] * oldGreen)/255;
+			let blue = (blockColour[2] * oldBlue)/255;
+			data[j] = Math.floor(red);
+			data[j+1] = Math.floor(green);
+			data[j+2] = Math.floor(blue);
+		}
+
+		ctx.putImageData(imageData, i*this.tileSize, 0);
+		for (let j=0; j<data.length; j++) {
+			data[j] = oldData[j];
+		}
+		
+	}
 }
 
 // redraws isometric render, to be called when contents of schematic block array changes.
@@ -143,4 +184,67 @@ IsometricRender.prototype.updateRender = function() {
   		}
     }
   }
+}
+
+
+IsometricRender.prototype.drawIsometricCube = function(inCTX, inX, inY, inSpan, inColour, isOutlined) {
+	let x = inX;
+	let y = inY;
+	let inner = 2;
+	let outer = 1;
+	let span = inSpan;
+	let ctx = inCTX;
+	
+	// top face
+	ctx.fillStyle = inColour; //"#00ffff";
+	ctx.beginPath();
+	ctx.moveTo(x+span/2,y);
+	ctx.lineTo(x+span,y+span/4);
+	ctx.lineTo(x+span/2,y+span/2);
+	ctx.lineTo(x,y+span/4);
+	ctx.closePath();
+	ctx.fill();
+	
+	// left face
+	ctx.fillStyle = adjustColourValue(inColour,0.8);
+	ctx.beginPath();
+	ctx.moveTo(x,y+span/4);
+	ctx.lineTo(x+span/2,y+span/2);
+	ctx.lineTo(x+span/2,y+span);
+	ctx.lineTo(x,y+span*3/4);
+	ctx.closePath();
+	ctx.fill();
+	
+	// right face
+	ctx.fillStyle = adjustColourValue(inColour,0.7);
+	ctx.beginPath();
+	ctx.moveTo(x+span/2,y+span/2);
+	ctx.lineTo(x+span,y+span/4);
+	ctx.lineTo(x+span,y+span*3/4);
+	ctx.lineTo(x+span/2,y+span);
+	ctx.closePath();
+	ctx.fill();
+	
+	if (isOutlined == true) {
+		ctx.fillStyle = adjustColourValue(inColour,0.4);
+		for (let i=0; i<span/4; i++) {
+			//top of block
+			ctx.fillRect(x+i*2+span/2-1,y+i,3,outer);
+			ctx.fillRect(x-i*2+span/2+1,y+i,-3,outer);
+			
+			// inner edge of top of block
+			ctx.fillRect(x+i*2+span/2-1, span/2+y-i,3,inner);
+			ctx.fillRect(x-i*2+span/2+1, span/2+y-i,-3,inner);
+			
+			// bottom of block
+			ctx.fillRect(x+i*2+span/2-1,span+y-i-outer,3,outer);
+			ctx.fillRect(x-i*2+span/2+1,span+y-i-outer,-3,outer);
+		}
+		//outer sides
+		ctx.fillRect(x+span-outer,span/4+y,outer,span/2);
+		ctx.fillRect(x,span/4+y,outer,span/2);
+		
+		// inner side
+		ctx.fillRect(x+span/2-inner+1,span/2+y,inner,span/2);
+	}
 }

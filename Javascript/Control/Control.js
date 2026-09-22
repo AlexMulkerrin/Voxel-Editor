@@ -287,6 +287,9 @@ Control.prototype.createButtons = function () {
 	this.button.push(  new Button(px+x*24, py+y*24, 22, 22, 11, "", "extendPalette") );
 	this.button.push(  new Button(c.width-33, 286, 22, 22, 7, "", "removePalette") );
 
+	this.button.push( new Button(c.width-33, 320, 22, 22, null, "", "toggleCustomColour") );
+	this.button.push( new Button(c.width-203, 330, 22, 22, null, "", "changeTexture") );
+
 	// rotation buttons
 	this.button.push( new Button(c.width-214, 240, 22, 22, 8, "", "rotateRender", -1) );
     this.button.push( new Button(c.width-23, 240, 22, 22, 9, "", "rotateRender", 1) );
@@ -420,6 +423,22 @@ Control.prototype.removePalette = function() {
 		this.currentColour = colourComponents(this.targetSchematic.palette[this.currentPalette].colour);
 		this.targetDisplay.updatePalette();
 	}
+}
+
+Control.prototype.changeTexture = function() {
+	var id = this.currentPalette ;
+	var textureTypes = Object.keys(textureID);
+	var prevTextureID = textureID[this.targetSchematic.palette[id].texture];
+	var nextTextureID = (prevTextureID + 1) % textureTypes.length;
+	this.targetSchematic.palette[id].texture = textureTypes[nextTextureID];
+	this.targetDisplay.updatePalette();
+}
+
+Control.prototype.toggleCustomColour = function() {
+	var id = this.currentPalette ;
+	var isToggled = this.targetSchematic.palette[id].customColour;
+	this.targetSchematic.palette[id].customColour = !isToggled;
+	this.targetDisplay.updatePalette();
 }
 
 Control.prototype.changeColour = function(colourID) {

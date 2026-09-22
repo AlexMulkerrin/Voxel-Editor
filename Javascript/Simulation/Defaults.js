@@ -5,7 +5,7 @@ const textureID = {stone:0, grass:1, dirt:2, cobblestone:3, planks:4, sapling:5,
 	log:14, leaves:15, sponge:16, glass:17, wool:18, "yellow flower":19, "red flower":20, "brown mushroom":21,
 	"red mushroom":22, "gold":23, "iron":24, "two half blocks":25, "half block":26,
 	brick:27, explosives:28, bookshelf:29, "mossy cobblestone":30, obsidian:31 };
-
+const modelID = {none:0, block:1, item:2, transparent:3, halfBlock:3, stair:4};
 
 function defaultPalette() {
   return [

@@ -7,6 +7,8 @@ function VoxelSchematic(width, height, depth) {
 
   this.block = create3DArray(width, height, depth, 0);
   this.visible = create3DArray(width, height, depth, false);
+  this.totals = [];
+  this.updateTotals();
 }
 VoxelSchematic.prototype.randomise = function() {
   for (var i=0; i<this.width; i++) {
@@ -16,7 +18,7 @@ VoxelSchematic.prototype.randomise = function() {
       }
     }
   }
-  this.checkVisible();
+  this.updateProperties();
 }
 VoxelSchematic.prototype.clear = function() {
   for (var i=0; i<this.width; i++) {
@@ -26,7 +28,12 @@ VoxelSchematic.prototype.clear = function() {
       }
     }
   }
-  this.checkVisible();
+  this.updateProperties();
+}
+
+VoxelSchematic.prototype.updateProperties = function() {
+	this.checkVisible();
+	this.updateTotals();
 }
 
 VoxelSchematic.prototype.extendPalette = function() {
@@ -81,7 +88,7 @@ VoxelSchematic.prototype.changeSize = function(deltaX, deltaY, deltaZ) {
 	this.block = newBlock;
 
 	this.visible = create3DArray(this.width, this.height, this.depth, false);
-	this.checkVisible();
+	this.updateProperties();
 
 }
 
@@ -118,7 +125,7 @@ VoxelSchematic.prototype.decreaseSize = function(deltaX, deltaY, deltaZ) {
 	this.block = newBlock;
 
 	this.visible = create3DArray(this.width, this.height, this.depth, false);
-	this.checkVisible();
+	this.updateProperties();
 
 }
 VoxelSchematic.prototype.increaseSize = function(deltaX, deltaY, deltaZ) {
@@ -138,7 +145,7 @@ VoxelSchematic.prototype.increaseSize = function(deltaX, deltaY, deltaZ) {
 	this.block = newBlock;
 
 	this.visible = create3DArray(this.width, this.height, this.depth, false);
-	this.checkVisible();
+	this.updateProperties();
 }
 
 VoxelSchematic.prototype.trimEdges = function() {
@@ -187,7 +194,7 @@ VoxelSchematic.prototype.trimEdges = function() {
 	this.block = newBlock;
 
 	this.visible = create3DArray(this.width, this.height, this.depth, false);
-	this.checkVisible();
+	this.updateProperties();
 
 }
 
@@ -206,7 +213,22 @@ VoxelSchematic.prototype.setVolume = function(start, end, id) {
 			}
         }
     }
-	this.checkVisible();
+	this.updateProperties();
+}
+
+VoxelSchematic.prototype.updateTotals = function() {
+	this.totals = [];
+	for (var i=0; i<this.palette.length; i++) {
+		this.totals[i]=0;
+	}
+	for (var i=0; i<this.width; i++) {
+		for (var j=0; j<this.height; j++) {
+	        for (var k=0; k<this.depth; k++) {
+				var id = this.block[i][j][k];
+				this.totals[id]++;
+			}
+		}
+	}
 }
 
 VoxelSchematic.prototype.runLengthEncodeBlockArray = function() {
@@ -298,7 +320,7 @@ VoxelSchematic.prototype.readJSON = function(JSONtext) {
 	this.block = this.readRunLengthEncoding(JSONtext["RunLengthEncoded blocks"]);
 
 	this.visible = create3DArray(this.width, this.height, this.depth, false);
-	this.checkVisible();
+	this.updateProperties();
 }
 VoxelSchematic.prototype.readRunLengthEncoding = function(JSONtext) {
 	var x=0; y=0; z=0;

@@ -6,10 +6,13 @@ function Display(canvasName, schematic, control) {
 	this.ctx = this.canvas.getContext("2d");
 
 	this.topdown = new TopdownRender(schematic);
-	this.topdown.loadImages();
+	//this.topdown.prepareBlockImages();
 
 	this.render = new IsometricRender(schematic);
 	this.minimap = new IsometricRender(schematic);
+	this.minimap.resizeTileSize(200,200);
+	this.minimap.createRender();
+	
 	this.imageLoader = new ImageLoader(this);
 
 	this.maxViewWidth;
@@ -40,7 +43,7 @@ Display.prototype.loadIcons = function () {
 			"camera", "rotate", "remove", "undo", "redo",
 			"fullscreen", "windowed", "scrollUp", "scrollDown", "scrollLeft",
 			"scrollRight", "resize", "position", "fitToWindow", "zoomIn",
-			"zoomOut"
+			"zoomOut","NewBlueprint"
 	];
     for (var i = 0; i < iconName.length; i++) {
         this.icon[i] = new Image();
@@ -92,6 +95,8 @@ Display.prototype.refresh = function() {
 
 	if (this.targetControl.currentTabView === viewTabID.isometric) {
 		this.drawIsometricRender();
+	} else if (this.targetControl.currentTabView === viewTabID.text) {
+		this.drawDetails();
 	}
 
   this.drawTooltips();
@@ -345,6 +350,21 @@ Display.prototype.drawCursor = function() {
 
 		this.ctx.fillStyle = "#22BCFE";
 	    this.drawRectOnView(mouse.latticeX*sqSize+offset, mouse.latticeZ*sqSize+offset, width, width);
+	}
+}
+
+Display.prototype.drawDetails = function() {
+	this.ctx.fillStyle = "#222222";
+	var palette = this.targetSchematic.palette;
+	var totals = this.targetSchematic.totals;
+	var entry = "";
+	var offsetY = 100;
+	for (var i=0; i<palette.length; i++) {
+		if (totals[i]>0) {
+			entry = palette[i].name + ": "+ this.targetSchematic.totals[i];
+			this.ctx.fillText(entry, 100, offsetY);
+			offsetY += 20;
+		}
 	}
 }
 

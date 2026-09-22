@@ -16,14 +16,33 @@ function create3DArray(width, height, depth, initialValue) {
 	return result;
 }
 
+function adjustColourValue(colour, percent) {
+	var components = [];
+    components = colourComponents(colour);
+    for (var i=0; i<components.length; i++) {
+        components[i] = Math.floor(components[i]*percent);
+        if (components[i]>255) components[i]=255;
+    }
+    return colourHexString(components[0],components[1],components[2]);
+}
+function colourHexString(red,green,blue) {
+    var colourString="#";
+    if (red<16) colourString += "0";
+    colourString += red.toString(16);
+    if (green<16) colourString += "0";
+    colourString += green.toString(16);
+    if (blue<16) colourString += "0";
+    colourString += blue.toString(16);
+    return colourString;
+}
 function colourComponents(colour) {
-	var components=[], string;
-	for (var i=0; i<3; i++) {
-		// "#rrggbb"
-		string = colour[1+i*2]+colour[2+i*2];
-		components[i]=parseInt(string,16);
-	}
-	return components;
+    var components=[], string;
+    for (var i=0; i<3; i++) {
+        // "#rrggbb"
+        string = colour[1+i*2]+colour[2+i*2];
+        components[i]=parseInt(string,16);
+    }
+    return components;
 }
 
 function toRGBString(red, green, blue) {
