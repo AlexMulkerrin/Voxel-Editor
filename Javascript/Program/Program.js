@@ -6,7 +6,7 @@ function loadProgram() {
 
 function Program(canvasName) {
 	this.updateDelay = 50;
-	this.schematic = new VoxelSchematic(3,3,3);
+	this.schematic = new VoxelSchematic(8,8,8);
 	//this.schematic.randomise();
 	var t = this;
 	this.control = new Control(canvasName, this.schematic, t);
