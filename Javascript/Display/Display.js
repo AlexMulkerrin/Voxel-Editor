@@ -333,23 +333,39 @@ Display.prototype.drawTooltips = function () {
 	}
 }
 Display.prototype.drawCursor = function() {
+	let ctrl = this.targetControl;
 	var sqSize = this.targetControl.view.pixelPerCell+1;
 	var offset = sqSize/4;
 	var width = sqSize/2;
-	var mouse = this.targetControl.mouse;
+	var m = this.targetControl.mouse;
 
-	if (mouse.isOverWorkspace) {
-		if (mouse.isPressed) {
+	if (m.isOverWorkspace) {
+		if (m.isPressed) {
 			this.ctx.fillStyle = "#9FAEC2";
-			this.drawRectOnView(mouse.oldLatticeX*sqSize+offset, mouse.oldLatticeZ*sqSize+offset, width, width);
-			this.drawRectOnView(mouse.oldLatticeX*sqSize+width, mouse.oldLatticeZ*sqSize+width, 2, (mouse.latticeZ-mouse.oldLatticeZ)*sqSize);
-			this.drawRectOnView(mouse.oldLatticeX*sqSize+width, mouse.oldLatticeZ*sqSize+width, (mouse.latticeX-mouse.oldLatticeX)*sqSize, 2);
-			this.drawRectOnView(mouse.latticeX*sqSize+width, mouse.latticeZ*sqSize+width, 2, (mouse.oldLatticeZ-mouse.latticeZ)*sqSize);
-			this.drawRectOnView(mouse.latticeX*sqSize+width, mouse.latticeZ*sqSize+width, (mouse.oldLatticeX-mouse.latticeX)*sqSize, 2);
+			this.drawRectOnView(m.oldLatticeX*sqSize+offset, m.oldLatticeZ*sqSize+offset, width, width);
+			this.drawRectOnView(m.oldLatticeX*sqSize+width, m.oldLatticeZ*sqSize+width, 2, (m.latticeZ-m.oldLatticeZ)*sqSize);
+			this.drawRectOnView(m.oldLatticeX*sqSize+width, m.oldLatticeZ*sqSize+width, (m.latticeX-m.oldLatticeX)*sqSize, 2);
+			this.drawRectOnView(m.latticeX*sqSize+width, m.latticeZ*sqSize+width, 2, (m.oldLatticeZ-m.latticeZ)*sqSize);
+			this.drawRectOnView(m.latticeX*sqSize+width, m.latticeZ*sqSize+width, (m.oldLatticeX-m.latticeX)*sqSize, 2);
 		}
 
 		this.ctx.fillStyle = "#22BCFE";
-	    this.drawRectOnView(mouse.latticeX*sqSize+offset, mouse.latticeZ*sqSize+offset, width, width);
+		if (ctrl.currentTabView == viewTabID.slice) {
+			this.drawRectOnView(m.latticeX*sqSize+offset, m.latticeZ*sqSize+offset, width, width);
+
+		} else if (ctrl.currentTabView == viewTabID.isometric) {
+			let cameraTileX = -7;
+			let cameraTileY = 1;
+			let tileSize = this.render.tileSize;
+			let viewOffsetX = 0;
+			let viewOffsetY = -tileSize;
+
+			let x = (m.latticeX-cameraTileX)*tileSize/2 - (m.latticeZ-cameraTileY)*tileSize/2 + viewOffsetX;
+			let y =	(m.latticeX-cameraTileX)*tileSize/4 + (m.latticeZ-cameraTileY)*tileSize/4 + viewOffsetY;
+
+			this.drawRectOnView(x+offset, y, offset, offset);
+		}
+	    
 	}
 }
 

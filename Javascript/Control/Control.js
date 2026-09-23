@@ -166,33 +166,49 @@ Control.prototype.checkHover = function () {
             }
         }
     }
-    if (this.mouse.isOverButton === false && this.currentTabView === viewTabID.slice) {
+    if (this.mouse.isOverButton === false ){//} && this.currentTabView === viewTabID.slice) {
         this.checkLattice();
     }
     this.targetDisplay.refresh();
 }
 Control.prototype.checkLattice = function () {
-    this.mouse.isOverWorkspace = true;
-    var cellSize = this.view.cellPerPixel/(this.view.pixelPerCell+1);
-    this.mouse.latticeX = Math.floor((this.mouse.x - this.view.x) * cellSize);
-	this.mouse.latticeY = this.view.sliceHeight;
-    this.mouse.latticeZ = Math.floor((this.mouse.y - this.view.y) * cellSize);
+    let m = this.mouse
 
-    if (this.mouse.latticeX < 0) {
-        this.mouse.isOverWorkspace = false;
-        this.mouse.latticeX = 0;
+    m.isOverWorkspace = true;
+    var cellSize = this.view.cellPerPixel/(this.view.pixelPerCell+1);
+
+    if (this.currentTabView == viewTabID.slice) {
+        m.latticeX = Math.floor((m.x - this.view.x) * cellSize);
+	    m.latticeY = this.view.sliceHeight;
+        m.latticeZ = Math.floor((m.y - this.view.y) * cellSize);
+    } else if (this.currentTabView == viewTabID.isometric) {
+
+        let cameraTileX = -7;
+        let cameraTileY = 1;
+        let tileSize = this.targetDisplay.render.tileSize;
+        mx = Math.floor(m.y/(tileSize/2) + m.x/(tileSize) - 0.5) + cameraTileX;
+	    my = Math.ceil(m.y/(tileSize/2) - m.x/(tileSize) - 0.5) + cameraTileY;
+
+        m.latticeX = mx;
+	    m.latticeY = this.view.sliceHeight;
+        m.latticeZ = my;
     }
-    if (this.mouse.latticeX >= this.targetSchematic.width) {
-        this.mouse.isOverWorkspace = false;
-        this.mouse.latticeX = this.targetSchematic.width - 1;
+
+    if (m.latticeX < 0) {
+        m.isOverWorkspace = false;
+        m.latticeX = 0;
     }
-    if (this.mouse.latticeZ < 0) {
-        this.mouse.isOverWorkspace = false;
-        this.mouse.latticeZ = 0;
+    if (m.latticeX >= this.targetSchematic.width) {
+        m.isOverWorkspace = false;
+        m.latticeX = this.targetSchematic.width - 1;
     }
-    if (this.mouse.latticeZ >= this.targetSchematic.depth) {
-        this.mouse.isOverWorkspace = false;
-        this.mouse.latticeZ = this.targetSchematic.depth - 1;
+    if (m.latticeZ < 0) {
+        m.isOverWorkspace = false;
+        m.latticeZ = 0;
+    }
+    if (m.latticeZ >= this.targetSchematic.depth) {
+        m.isOverWorkspace = false;
+        m.latticeZ = this.targetSchematic.depth - 1;
     }
 }
 Control.prototype.setOldHover = function () {
